@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="IntelliAsk: Learning to Ask Critical Questions with Human-Aligned Rewards. A system for generating high-quality peer review questions using reward models trained on human preferences.">
-  <meta name="keywords" content="IntelliAsk, Peer Review, Question Generation, Reward Models, LLM, ACL 2026">
+        content="Preference Optimization for Review Question Generation Improves Writing Quality. Training LLMs to ask better peer review questions through human-aligned reward models improves reasoning and writing capabilities.">
+  <meta name="keywords" content="IntelliAsk, IntelliReward, Peer Review, Question Generation, Reward Models, Reinforcement Learning, DAPO, LLM, ACL 2026">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IntelliAsk: Learning to Ask Critical Questions with Human-Aligned Rewards</title>
+  <title>Preference Optimization for Review Question Generation Improves Writing Quality</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
@@ -53,23 +53,33 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">IntelliAsk: Learning to Ask Critical Questions with Human-Aligned Rewards</h1>
+          <h1 class="title is-1 publication-title">Preference Optimization for Review Question Generation Improves Writing Quality</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              First Author<sup>1</sup>,</span>
-            <span class="author-block">
-              Second Author<sup>2</sup>
-            </span>
-          </div>
-
-          <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>Affiliation / Address line 1,</span>
-            <span class="author-block"><sup>2</sup>Affiliation / Address line 1</span>
+              Anonymous Authors</span>
           </div>
 
           <div class="column has-text-centered">
             <div class="publication-links">
-              <!-- Links will be added here when available -->
+              <!-- PDF Link -->
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper (Coming Soon)</span>
+                </a>
+              </span>
+              <!-- Code Link -->
+              <span class="link-block">
+                <a href="https://anonymous.4open.science/r/IntelliA-3E09/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
             </div>
           </div>
         </div>
@@ -85,8 +95,8 @@
            alt="IntelliAsk Architecture" 
            style="width: 100%; max-width: 1000px; margin: 0 auto; display: block; border-radius: 10px;">
       <h2 class="subtitle has-text-centered">
-        <span class="dnerf">IntelliAsk</span> generates critical, well-reasoned questions for peer review
-        using human-aligned reward models.
+        <span class="dnerf">IntelliAsk</span> learns to generate critical, evidence-based peer review questions through
+        reinforcement learning with human preferences. Training on question quality improves both reasoning and writing abilities.
       </h2>
     </div>
   </div>
@@ -95,31 +105,58 @@
 
 <section class="hero is-light is-small">
   <div class="hero-body">
-    <div class="container">
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-architecture">
-          <img src="./static/images/intelliask/architecture.png" alt="IntelliAsk Architecture" style="width: 100%; height: auto;">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered" style="margin-bottom: 30px;">Try IntelliAsk</h2>
+      <div class="demo-container">
+        <div class="columns is-vcentered">
+          <div class="column is-6">
+            <div class="upload-area">
+              <div class="upload-box">
+                <i class="fas fa-file-pdf fa-3x" style="color: #3273dc; margin-bottom: 20px;"></i>
+                <p class="upload-text"><strong>Upload a research paper (PDF)</strong></p>
+                <input type="file" id="paper-upload" accept=".pdf" style="display: none;">
+                <button class="button is-primary is-medium" style="margin-top: 15px;" onclick="document.getElementById('paper-upload').click()">
+                  <span class="icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span>Choose File</span>
+                </button>
+                <p class="help" style="margin-top: 10px; color: #7a7a7a;">Maximum 9 pages recommended</p>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="generation-area">
+              <h4 class="title is-5">Generated Questions</h4>
+              <div class="question-output">
+                <div class="notification is-light" style="min-height: 150px; display: flex; align-items: center; justify-content: center;">
+                  <p class="has-text-grey" style="text-align: center;">
+                    <i class="fas fa-arrow-left" style="margin-right: 10px;"></i>
+                    Upload a paper to generate critical review questions
+                  </p>
+                </div>
+              </div>
+              <button class="button is-success is-medium is-fullwidth" style="margin-top: 15px;" disabled>
+                <span class="icon">
+                  <i class="fas fa-magic"></i>
+                </span>
+                <span>Generate Questions with IntelliAsk</span>
+              </button>
+              <p class="help has-text-centered" style="margin-top: 10px;">
+                <span class="tag is-warning is-light">Interactive Demo Coming Soon</span>
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="item item-reward">
-          <img src="./static/images/intelliask/reward_model.png" alt="IntelliReward Architecture" style="width: 100%; height: auto;">
-        </div>
-        <div class="item item-data">
-          <img src="./static/images/intelliask/data_pipeline.png" alt="Data Pipeline" style="width: 100%; height: auto;">
-        </div>
-        <div class="item item-scores">
-          <img src="./static/images/intelliask/score_graph.png" alt="Score Distribution" style="width: 100%; height: auto;">
-        </div>
-        <div class="item item-curation">
-          <img src="./static/images/intelliask/data_curation.png" alt="Data Curation" style="width: 100%; height: auto;">
-        </div>
-        <div class="item item-waterfall">
-          <img src="./static/images/intelliask/waterfall.png" alt="Filtering Pipeline" style="width: 100%; height: auto;">
-        </div>
-        <div class="item item-training">
-          <img src="./static/images/intelliask/sft_vs_rl.png" alt="Training Curves" style="width: 100%; height: auto;">
-        </div>
-        <div class="item item-preference">
-          <img src="./static/images/intelliask/IntelliAskvsOthersPreferences.png" alt="Preference Comparison" style="width: 100%; height: auto;">
+        <div class="columns" style="margin-top: 30px;">
+          <div class="column">
+            <div class="notification is-info is-light">
+              <p class="has-text-centered">
+                <strong><i class="fas fa-info-circle"></i> How it works:</strong> IntelliAsk reads your paper and generates evidence-based, high-effort questions
+                that require critical thinking to answer. Questions are scored by IntelliReward on <strong>Effort</strong>, <strong>Evidence</strong>, and <strong>Grounding</strong>.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -135,13 +172,24 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Peer review relies on substantive, evidence-based questions, but existing LLM-based approaches often generate surface-level queries. We find that LLM-generated questions take over 50% of their question tokens from a paper's first page, while human reviewers draw on the full text. Human questions are also more insightful, showing effort and grounding, whereas LLM questions mostly reflect surface style.
+            Peer review relies on substantive, evidence-based questions, yet existing LLM-based approaches often generate surface-level queries.
+            We find that LLM-generated questions draw over 50% of their tokens from a paper's first page, while human reviewers engage with the full text.
+            Human questions also demonstrate greater effort and grounding, whereas LLM questions primarily mimic stylistic patterns.
           </p>
           <p>
-            To address this, we extract 151k candidate questions from ICLR 2024 reviews and filter them through a multi-stage filtering process into Probe-15K, a set of 15.5k high-quality questions. From this, we create ProbeVote-500, where human annotators score questions along effort, evidence, and grounding. Using these labels, we train IntelliReward, a reward model built from a frozen Autoregressive LLM with trainable multi-head transformers over the final 50 token states. This architecture outperforms API-based SFT finetuning (Gemini 2.5 Flash, GPT-4.1) as baselines for reward.
+            To bridge this gap, we develop <strong>IntelliReward</strong>, a novel reward model built from a frozen autoregressive LLM with
+            trainable multi-head transformers over the final 50 token states, which outperforms API-based SFT baselines
+            (Gemini 2.5 Flash, GPT-4.1) in predicting expert-level human preferences. By applying Decoupled Clip and Dynamic
+            Sampling Policy Optimization (DAPO) with IntelliReward, we train <strong>IntelliAsk</strong>, a question-generation model
+            aligned with human standards of effort, evidence, and grounding.
           </p>
           <p>
-            Applying DAPO with IntelliReward, we train <span class="dnerf">IntelliAsk</span>, a question-generation model aligned with human preferences and substantially stronger than existing fine-tuned review models. Finally, by releasing Probe-15K, ProbeVote-500, and IntelliReward, we provide an automatic evaluation benchmark for reviewer questions that measures groundedness, effort, and evidence.
+            We find consistent improvements on reasoning and writing benchmarks, suggesting reviewer-question quality correlates
+            with broader capabilities. Compared to the Qwen3-32B base model, IntelliAsk shows measurable gains across diverse
+            benchmarks, specifically improving performance on reasoning tasks like <strong>MuSR (68.3 vs 64.7 Acc)</strong> and complex
+            writing evaluations such as <strong>WritingBench (8.31 vs 8.07)</strong>. We release our implementation, expert preference
+            annotations, and the IntelliReward model to provide an automatic evaluation benchmark for grounding, effort, and
+            evidence in LLM-generated review questions.
           </p>
         </div>
       </div>
@@ -152,61 +200,42 @@
 </section>
 
 
+
+
 <section class="section">
   <div class="container is-max-desktop">
 
-    <!-- Probe-15K Dataset. -->
+    <!-- Human Preference Annotation Study -->
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3">Probe-15K Dataset</h2>
+        <h2 class="title is-3">Human Preference Annotation Study</h2>
         <div class="content has-text-justified">
           <p>
-            We collected a dataset of reviewer feedback by scraping all publicly available reviews from ICLR 2024 using the OpenReview API. For each paper, we retrieved the corresponding metadata and downloaded the main PDF (excluding supplementary materials), limiting the maximum length to nine pages.
+            We collected 15.5k high-quality questions from ICLR 2024 reviews through a multi-stage filtering process
+            (length filtering, semantic deduplication, removing non-technical content and vague questions).
+            To benchmark the gap between human and LLM-generated questions, we conducted a human annotation study with
+            <strong>572 annotated question-paper pairs</strong> sampled from 300 randomly selected ICLR 2025 submissions on OpenReview.
+            For each paper, we generated questions using three state-of-the-art LLMs (o3, Gemini 2.5 Pro, Qwen2.5-32B) and
+            compared them to human-authored reviewer questions.
           </p>
           <p>
-            To address variability in question placement, we used Gemini 2.0 to extract questions from the <i>Questions</i>, <i>Strengths</i>, and <i>Weaknesses</i> sections, preserving their original phrasing and tone. The initial extraction produced about 151,000 questions.
-          </p>
-          <p>
-            We applied a series of filtering steps to ensure quality:
+            Four expert annotators read each paper in full, including text, figures, and equations, to ensure proper context.
+            All questions were anonymized to eliminate source bias. Annotators then scored each question according to three binary dimensions:
           </p>
           <ul>
-            <li><strong>Length-Based Filtering:</strong> Excluded questions under 100 characters (removed 34,000 entries)</li>
-            <li><strong>Semantic Deduplication:</strong> Applied clustering to eliminate redundant questions (reduced to 95,000)</li>
-            <li><strong>Non-Technical Content Filtering:</strong> Removed grammar, formatting, and unprofessional comments (removed 41,000)</li>
-            <li><strong>Specificity Filtering:</strong> Removed vague or speculative questions (removed 38,500)</li>
+            <li><strong>Effort:</strong> Does the question demand real thought to answer? Low-effort questions can be answered
+            by directly quoting the paper, whereas high-effort questions require synthesis, critical thinking, and connecting ideas
+            across sections.</li>
+            <li><strong>Evidence:</strong> Is the question backed by specific content from the paper? High-evidence questions point
+            to particular results, assumptions, methodological choices, or arguments rather than making speculative claims.</li>
+            <li><strong>Grounding:</strong> Is the question anchored in the actual content of the paper? Grounded questions refer
+            to concrete methods, experiments, or claims across sections rather than generic phrasing that could apply to any paper.</li>
           </ul>
           <p>
-            After filtering, the final dataset contained 15.5k questions drawn from 5,841 unique papers. The train dataset contains 13.2k questions and the test dataset contains 2.3k questions.
+            Results show that <strong>human-written questions scored 0.78 points higher on average than the strongest model</strong>
+            and <strong>1.53 points higher than the lowest scoring model</strong>. Human questions demonstrated substantially greater
+            effort, evidence, and grounding compared to all LLM baselines.
           </p>
-        </div>
-        <div class="columns is-vcentered">
-          <div class="column">
-            <img src="./static/images/intelliask/data_curation.png" alt="Data Curation Pipeline" style="width: 100%; border-radius: 10px;">
-          </div>
-          <div class="column">
-            <img src="./static/images/intelliask/waterfall.png" alt="Filtering Pipeline" style="width: 100%; border-radius: 10px;">
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--/ Probe-15K Dataset. -->
-
-    <!-- ProbeVote-500. -->
-    <div class="columns is-centered">
-      <div class="column is-full-width">
-        <h2 class="title is-3">ProbeVote-500: Human Preference Annotation</h2>
-        <div class="content has-text-justified">
-          <p>
-            ProbeVote-500 consists of 572 annotated question–paper pairs abstracted from 300 randomly sampled ICLR 2025 submissions on OpenReview. For each paper, the full text was provided as input to large language models (Gemini 2.5 Flash, o3, Qwen2.5-32B), yielding one model-generated question per system. In parallel, the corresponding human-authored reviewer question from OpenReview was included as the reference.
-          </p>
-          <p>
-            Human evaluators read each paper in full, including text, figures, and equations, to ensure proper context. Annotators then scored each anonymized question according to three binary dimensions:
-          </p>
-          <ul>
-            <li><strong>Effort:</strong> Does the question demand real thought to answer? Low-effort questions can be answered by directly quoting the paper, whereas high-effort questions require synthesis and critical thinking.</li>
-            <li><strong>Evidence:</strong> Is the question backed by specific content from the paper? High-evidence questions point to particular results, assumptions, or arguments.</li>
-            <li><strong>Grounding:</strong> Is the question anchored in the actual content of the paper? Grounded questions refer to concrete methods, experiments, or claims across sections.</li>
-          </ul>
         </div>
         <div class="columns is-vcentered">
           <div class="column">
@@ -215,21 +244,35 @@
         </div>
       </div>
     </div>
-    <!--/ ProbeVote-500. -->
+    <!--/ Human Preference Annotation Study -->
 
-    <!-- IntelliReward. -->
+    <!-- IntelliReward -->
     <div class="columns is-centered">
       <div class="column is-full-width">
         <h2 class="title is-3">IntelliReward: Reward Model Architecture</h2>
         <div class="content has-text-justified">
           <p>
-            Evaluating all 15,500 questions with human annotators across three rubrics is costly and risks bias from fatigue. To reduce reliance on manual effort, we trained IntelliReward on ProbeVote-500 to serve as an efficient and scalable substitute for human judgment.
+            Evaluating all 15,500 questions with human annotators across three rubrics is costly and risks bias from fatigue.
+            Leading closed-source LLMs tested on reward prediction showed weak accuracy (Gemini 2.5 Flash: 37%, GPT-4.1: 32%),
+            required large inputs, and incurred high inference costs, making them unsuitable for large-scale benchmarking.
+            To overcome this, we trained <strong>IntelliReward</strong> on our human preference annotations to serve as an
+            efficient and scalable substitute for human judgment.
           </p>
           <p>
-            Our reward model handles multiple objectives by pairing a causal LLM with per-objective Transformer heads. We use <code>gpt-oss-20b</code> (medium reasoning) as the base. Given an input (e.g., paper OCR, generated question, task prompt), the LLM encodes it into a fixed representation. We extract the pooled hidden states of the last 50 output tokens and pass it to our per-objective Transformer head, which empirically improves performance compared to using an MLP head.
+            Our reward model handles multiple objectives by pairing a frozen causal LLM with per-objective Transformer heads.
+            We use <code>gpt-oss-20b</code> (medium reasoning) as the base. Given an input (paper OCR, generated question, task prompt),
+            the LLM encodes it into a fixed representation. We extract the pooled hidden states of the <strong>last 50 output tokens</strong>
+            and pass them to our per-objective Transformer head, which empirically improves performance compared to using an MLP head.
           </p>
           <p>
-            Each evaluation objective (Effort, Evidence, Grounding) has an independent head producing logits. During training, the model minimizes the total loss across all objectives. IntelliReward achieves 72% mean accuracy, outperforming API-based LLM-as-judge baselines (Gemini 2.5 Flash: 37%, GPT-4.1: 32%, GPT-5: 53%).
+            Each evaluation objective (Effort, Evidence, Grounding) has an independent head producing logits. During training,
+            the model minimizes the total cross-entropy loss across all objectives. Only the per-objective heads are trained while
+            the LLM backbone remains frozen, making training efficient (30 minutes on a single NVIDIA L40S GPU).
+          </p>
+          <p>
+            <strong>IntelliReward achieves 72% mean accuracy</strong>, substantially outperforming API-based LLM-as-judge baselines:
+            Gemini 2.5 Flash (37%), GPT-4.1 (32%), GPT-5 (53%), and even SFT-tuned versions (36-53%). The per-objective head is
+            lightweight, requiring only 300MB of GPU VRAM during inference.
           </p>
         </div>
         <div class="columns is-vcentered">
@@ -239,52 +282,408 @@
         </div>
       </div>
     </div>
-    <!--/ IntelliReward. -->
+    <!--/ IntelliReward -->
 
-    <!-- IntelliAsk. -->
+    <!-- IntelliAsk -->
     <div class="columns is-centered">
       <div class="column is-full-width">
         <h2 class="title is-3">IntelliAsk: Training with Human-Aligned Rewards</h2>
         <div class="content has-text-justified">
           <p>
-            As shown in our experiments, supervised fine-tuning (SFT) performs poorly for review question generation: the model copies surface style but does not produce questions with real effort, evidence, or grounding. To address this, we use our reward model, <strong>IntelliReward</strong>, to align generation with human preferences.
+            As shown in our experiments, <strong>supervised fine-tuning (SFT) performs poorly for review question generation</strong>:
+            the model copies surface style but does not produce questions with real effort, evidence, or grounding. SFT-trained models
+            like OpenReviewer-8B and DeepReviewer-7B achieve scores of only 0.10/3.0, barely above baseline. Even our own SFT model
+            trained on filtered human questions achieves only 0.03/3.0, demonstrating that SFT mostly imitates reviewer style without
+            learning the deeper qualities that make questions useful.
           </p>
           <p>
-            We train with DAPO for IntelliAsk-7B and GRPO for IntelliAsk-32B: for each paper, the model generates several candidate questions, which are scored by IntelliReward, and these scores are used as rewards to guide optimization. The resulting model, <strong>IntelliAsk-32B</strong>, consistently outperforms SFT-only baselines by producing questions that are more evidence-based, better grounded, and require greater effort.
+            To address this, we use reinforcement learning with <strong>IntelliReward</strong> to align generation with human preferences.
+            We train <strong>IntelliAsk-7B</strong> using DAPO (Decoupled Clip and Dynamic Sampling Policy Optimization) and
+            <strong>IntelliAsk-32B</strong> using GRPO (Group Relative Policy Optimization). For each paper, the model generates
+            several candidate questions, which are scored by IntelliReward, and these scores are used as rewards to guide optimization.
+          </p>
+          <p>
+            The resulting model, <strong>IntelliAsk-32B</strong>, achieves 0.55/3.0 on automatic evaluation, substantially outperforming
+            SFT-only baselines (0.03-0.10/3.0) and competitive with frontier models. In human evaluation, IntelliAsk-32B achieves
+            0.66/3.0, outperforming Gemini 2.5 Pro (0.60/3.0). Notably, IntelliAsk-32B achieves the <strong>lowest first-page bias
+            (21.37%)</strong> among all models, indicating that it draws from the full paper rather than relying primarily on the introduction.
           </p>
         </div>
         <div class="columns is-vcentered">
           <div class="column">
-            <img src="./static/images/intelliask/sft_vs_rl.png" alt="Training Curves" style="width: 100%; border-radius: 10px;">
+            <img src="./static/images/intelliask/sft_vs_rl.png" alt="Training Curves: SFT vs RL" style="width: 100%; border-radius: 10px;">
           </div>
         </div>
       </div>
     </div>
-    <!--/ IntelliAsk. -->
+    <!--/ IntelliAsk -->
 
-
-    <!-- Related Work. -->
+    <!-- Evaluation Results -->
     <div class="columns is-centered">
       <div class="column is-full-width">
-        <h2 class="title is-3">Related Work</h2>
+        <h2 class="title is-3">Evaluation Results</h2>
 
-        <div class="content has-text-justified">
+        <h3 class="title is-4" style="margin-top: 30px;">Question Generation Performance</h3>
+        <div class="content">
           <p>
-            Recent research has increasingly explored the use of large language models (LLMs) to automate aspects of peer review. Several works train models on large corpora of reviews, often through supervised fine-tuning (SFT). For instance, <a href="https://aclanthology.org/2025.naacl-demo.44/">OpenReviewer</a> fine-tunes LLaMA-8B on 79K reviews to produce fluent and structured assessments, while <a href="https://aclanthology.org/2025.acl-long.1420/">DeepReview</a> develops a multi-stage pipeline that integrates retrieval and self-reflection.
+            We evaluate IntelliAsk through both human evaluation and automatic evaluation using IntelliReward.
+            IntelliAsk-32B substantially outperforms all small models (≤32B parameters) and is competitive with frontier models.
           </p>
-          <p>
-            Other approaches explore multi-agent frameworks. <a href="https://arxiv.org/abs/2401.04259">MARG</a> distributes paper sections across specialized agents that collaborate to generate comprehensive feedback, while <a href="https://aclanthology.org/2024.findings-acl.580/">SWIF²T</a> decomposes review generation into planner, investigator, reviewer, and controller modules.
+        </div>
+
+        <!-- Question Generation Table -->
+        <div class="table-container" style="margin-top: 20px; margin-bottom: 40px;">
+          <table class="table is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr style="background-color: #f5f5f5;">
+                <th>Model</th>
+                <th class="has-text-centered">Reasoning</th>
+                <th class="has-text-centered">Effort</th>
+                <th class="has-text-centered">Evidence</th>
+                <th class="has-text-centered">Grounding</th>
+                <th class="has-text-centered">Total (0-3)</th>
+                <th class="has-text-centered">First Page Bias ↓</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color: #ffe6e6;">
+                <td><strong>Human questions</strong></td>
+                <td class="has-text-centered">—</td>
+                <td class="has-text-centered">0.54</td>
+                <td class="has-text-centered">0.46</td>
+                <td class="has-text-centered">0.57</td>
+                <td class="has-text-centered"><strong>1.57</strong></td>
+                <td class="has-text-centered">28.21%</td>
+              </tr>
+              <tr>
+                <td colspan="7" class="has-background-light"><strong>Large Models</strong></td>
+              </tr>
+              <tr>
+                <td>o3</td>
+                <td class="has-text-centered">Medium</td>
+                <td class="has-text-centered"><strong>0.28</strong></td>
+                <td class="has-text-centered">0.14</td>
+                <td class="has-text-centered"><strong>0.30</strong></td>
+                <td class="has-text-centered"><strong>0.72</strong></td>
+                <td class="has-text-centered"><strong>16.81%</strong></td>
+              </tr>
+              <tr>
+                <td>Gemini 2.5 Pro</td>
+                <td class="has-text-centered">Default</td>
+                <td class="has-text-centered">0.22</td>
+                <td class="has-text-centered">0.11</td>
+                <td class="has-text-centered">0.18</td>
+                <td class="has-text-centered">0.51</td>
+                <td class="has-text-centered">25.75%</td>
+              </tr>
+              <tr>
+                <td>GPT-5</td>
+                <td class="has-text-centered">Default</td>
+                <td class="has-text-centered">0.09</td>
+                <td class="has-text-centered">0.20</td>
+                <td class="has-text-centered">0.16</td>
+                <td class="has-text-centered">0.45</td>
+                <td class="has-text-centered">18.63%</td>
+              </tr>
+              <tr>
+                <td>Claude 3.7 Sonnet</td>
+                <td class="has-text-centered">Default</td>
+                <td class="has-text-centered">0.08</td>
+                <td class="has-text-centered">0.16</td>
+                <td class="has-text-centered">0.13</td>
+                <td class="has-text-centered">0.37</td>
+                <td class="has-text-centered">47.13%</td>
+              </tr>
+              <tr>
+                <td>GPT-4.1</td>
+                <td class="has-text-centered">No</td>
+                <td class="has-text-centered">0.07</td>
+                <td class="has-text-centered">0.12</td>
+                <td class="has-text-centered">0.12</td>
+                <td class="has-text-centered">0.31</td>
+                <td class="has-text-centered">31.73%</td>
+              </tr>
+              <tr>
+                <td colspan="7" class="has-background-light"><strong>Small Models (≤32B)</strong></td>
+              </tr>
+              <tr style="background-color: #e6f3ff;">
+                <td><strong>IntelliAsk-32B (Ours)</strong></td>
+                <td class="has-text-centered">Default</td>
+                <td class="has-text-centered">0.23</td>
+                <td class="has-text-centered">0.12</td>
+                <td class="has-text-centered">0.20</td>
+                <td class="has-text-centered"><strong>0.55</strong></td>
+                <td class="has-text-centered"><strong>21.37%</strong></td>
+              </tr>
+              <tr>
+                <td>Qwen3-32B (base)</td>
+                <td class="has-text-centered">Default</td>
+                <td class="has-text-centered">0.05</td>
+                <td class="has-text-centered">0.13</td>
+                <td class="has-text-centered">0.09</td>
+                <td class="has-text-centered">0.28</td>
+                <td class="has-text-centered">26.73%</td>
+              </tr>
+              <tr>
+                <td>IntelliAsk-7B (Ours)</td>
+                <td class="has-text-centered">No</td>
+                <td class="has-text-centered">0.03</td>
+                <td class="has-text-centered">0.07</td>
+                <td class="has-text-centered">0.07</td>
+                <td class="has-text-centered">0.17</td>
+                <td class="has-text-centered">27.44%</td>
+              </tr>
+              <tr>
+                <td>OpenReviewer-8B</td>
+                <td class="has-text-centered">No</td>
+                <td class="has-text-centered">0.00</td>
+                <td class="has-text-centered">0.00</td>
+                <td class="has-text-centered">0.10</td>
+                <td class="has-text-centered">0.10</td>
+                <td class="has-text-centered">51.14%</td>
+              </tr>
+              <tr>
+                <td>DeepReviewer-7B</td>
+                <td class="has-text-centered">No</td>
+                <td class="has-text-centered">0.00</td>
+                <td class="has-text-centered">0.00</td>
+                <td class="has-text-centered">0.10</td>
+                <td class="has-text-centered">0.10</td>
+                <td class="has-text-centered">48.14%</td>
+              </tr>
+              <tr>
+                <td>Qwen2.5-7B SFT (Ours)</td>
+                <td class="has-text-centered">No</td>
+                <td class="has-text-centered">0.00</td>
+                <td class="has-text-centered">0.01</td>
+                <td class="has-text-centered">0.02</td>
+                <td class="has-text-centered">0.03</td>
+                <td class="has-text-centered">42.11%</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="help has-text-centered" style="margin-top: 10px;">
+            <strong>Automatic evaluation using IntelliReward.</strong> IntelliAsk-32B achieves the highest score among small models (0.55/3.0).
+            Scores represent mean values for Effort, Evidence, and Grounding (each 0-1). First Page Bias measures reliance on introduction.
           </p>
+        </div>
+
+        <h3 class="title is-4" style="margin-top: 40px;">Generalization to Writing and Reasoning Tasks</h3>
+        <div class="content">
           <p>
-            Several datasets and evaluation frameworks also relate closely. <a href="https://aclanthology.org/2025.naacl-long.22/">PeerQA</a>, <a href="https://openreview.net/forum?id=DfhcOelEnP">cPAPERS</a>, and <a href="https://aclanthology.org/2024.emnlp-main.1163/">SciDQA</a> harvest reviewer questions and author responses, facilitating tasks such as answer generation or content retrieval rather than explicit question generation itself.
+            Beyond scientific question generation, IntelliAsk shows consistent improvements on external reasoning and writing benchmarks,
+            suggesting that reviewer-question quality correlates with broader capabilities.
           </p>
+        </div>
+
+        <!-- Generalization Table -->
+        <div class="table-container" style="margin-top: 20px; margin-bottom: 40px;">
+          <table class="table is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr style="background-color: #f5f5f5;">
+                <th>Benchmark</th>
+                <th class="has-text-centered">IntelliAsk-32B</th>
+                <th class="has-text-centered">Qwen3-32B</th>
+                <th class="has-text-centered">Metric</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="4" class="has-background-light"><strong>Reasoning & Comprehension</strong></td>
+              </tr>
+              <tr>
+                <td>DROP</td>
+                <td class="has-text-centered"><strong>95.1</strong></td>
+                <td class="has-text-centered">93.3</td>
+                <td class="has-text-centered">F1 / Acc</td>
+              </tr>
+              <tr>
+                <td>MuSR</td>
+                <td class="has-text-centered"><strong>68.3</strong></td>
+                <td class="has-text-centered">64.7</td>
+                <td class="has-text-centered">Accuracy</td>
+              </tr>
+              <tr>
+                <td>BoolQ</td>
+                <td class="has-text-centered"><strong>90.0</strong></td>
+                <td class="has-text-centered"><strong>90.0</strong></td>
+                <td class="has-text-centered">Accuracy</td>
+              </tr>
+              <tr>
+                <td>GPQA-Diamond</td>
+                <td class="has-text-centered"><strong>69.1</strong></td>
+                <td class="has-text-centered">68.4</td>
+                <td class="has-text-centered">Accuracy</td>
+              </tr>
+              <tr>
+                <td colspan="4" class="has-background-light"><strong>Writing & Generation</strong></td>
+              </tr>
+              <tr style="background-color: #e6f3ff;">
+                <td><strong>WritingBench</strong></td>
+                <td class="has-text-centered"><strong>8.31</strong></td>
+                <td class="has-text-centered">8.07</td>
+                <td class="has-text-centered">Score (0-10)</td>
+              </tr>
+              <tr style="background-color: #e6f3ff;">
+                <td><strong>Arena Hard</strong></td>
+                <td class="has-text-centered"><strong>94.1</strong></td>
+                <td class="has-text-centered">93.8</td>
+                <td class="has-text-centered">Score (0-100)</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="help has-text-centered" style="margin-top: 10px;">
+            <strong>External benchmarks.</strong> IntelliAsk-32B outperforms Qwen3-32B on writing tasks while remaining competitive
+            on reasoning benchmarks. Learning to ask better questions improves general writing ability.
+          </p>
+        </div>
+
+        <h3 class="title is-4" style="margin-top: 40px;">Detailed WritingBench Performance by Category</h3>
+        <div class="content">
           <p>
-            Despite this progress, existing research overwhelmingly treats peer review as a problem of generating full reviews or answering reviewer questions. Very little attention has been given to <i>question generation itself</i>—the actionable and constructive element of peer feedback. Our work directly addresses this gap by introducing a human-annotated dataset of reviewer-style questions and training a specialized model for generating probing, useful questions in peer review.
+            IntelliAsk-32B demonstrates dominant performance across WritingBench domains, surpassing Qwen3-32B in the vast majority of evaluated categories.
+          </p>
+        </div>
+
+        <!-- WritingBench Detailed Table -->
+        <div class="table-container" style="margin-top: 20px; margin-bottom: 40px;">
+          <div class="columns">
+            <div class="column is-6">
+              <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                  <tr style="background-color: #f5f5f5;">
+                    <th>Category</th>
+                    <th class="has-text-centered">IntelliAsk-32B</th>
+                    <th class="has-text-centered">Qwen3-32B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Academic & Engineering</td>
+                    <td class="has-text-centered"><strong>8.33</strong></td>
+                    <td class="has-text-centered">8.09</td>
+                  </tr>
+                  <tr>
+                    <td>Finance & Business</td>
+                    <td class="has-text-centered"><strong>8.22</strong></td>
+                    <td class="has-text-centered">8.04</td>
+                  </tr>
+                  <tr>
+                    <td>Politics & Law</td>
+                    <td class="has-text-centered"><strong>8.29</strong></td>
+                    <td class="has-text-centered">8.02</td>
+                  </tr>
+                  <tr>
+                    <td>Medical & Health</td>
+                    <td class="has-text-centered"><strong>8.34</strong></td>
+                    <td class="has-text-centered">8.09</td>
+                  </tr>
+                  <tr>
+                    <td>Technology</td>
+                    <td class="has-text-centered"><strong>8.22</strong></td>
+                    <td class="has-text-centered">7.96</td>
+                  </tr>
+                  <tr>
+                    <td>Arts & Culture</td>
+                    <td class="has-text-centered"><strong>8.31</strong></td>
+                    <td class="has-text-centered">8.10</td>
+                  </tr>
+                  <tr>
+                    <td>Education</td>
+                    <td class="has-text-centered"><strong>8.41</strong></td>
+                    <td class="has-text-centered">8.22</td>
+                  </tr>
+                  <tr>
+                    <td>Marketing & Sales</td>
+                    <td class="has-text-centered"><strong>8.28</strong></td>
+                    <td class="has-text-centered">8.02</td>
+                  </tr>
+                  <tr>
+                    <td>Science & Nature</td>
+                    <td class="has-text-centered"><strong>8.35</strong></td>
+                    <td class="has-text-centered">8.14</td>
+                  </tr>
+                  <tr>
+                    <td>Social Sciences</td>
+                    <td class="has-text-centered"><strong>8.32</strong></td>
+                    <td class="has-text-centered">8.09</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="column is-6">
+              <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                  <tr style="background-color: #f5f5f5;">
+                    <th>Category</th>
+                    <th class="has-text-centered">IntelliAsk-32B</th>
+                    <th class="has-text-centered">Qwen3-32B</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Contract</td>
+                    <td class="has-text-centered"><strong>8.16</strong></td>
+                    <td class="has-text-centered">7.94</td>
+                  </tr>
+                  <tr>
+                    <td>Test Report</td>
+                    <td class="has-text-centered"><strong>8.35</strong></td>
+                    <td class="has-text-centered">8.01</td>
+                  </tr>
+                  <tr>
+                    <td>User Research</td>
+                    <td class="has-text-centered"><strong>7.93</strong></td>
+                    <td class="has-text-centered">7.72</td>
+                  </tr>
+                  <tr>
+                    <td>Review</td>
+                    <td class="has-text-centered"><strong>8.24</strong></td>
+                    <td class="has-text-centered">8.00</td>
+                  </tr>
+                  <tr>
+                    <td>Report</td>
+                    <td class="has-text-centered"><strong>8.36</strong></td>
+                    <td class="has-text-centered">8.13</td>
+                  </tr>
+                  <tr>
+                    <td>Blog Post</td>
+                    <td class="has-text-centered"><strong>8.39</strong></td>
+                    <td class="has-text-centered">8.16</td>
+                  </tr>
+                  <tr>
+                    <td>Creative Writing</td>
+                    <td class="has-text-centered"><strong>8.31</strong></td>
+                    <td class="has-text-centered">8.09</td>
+                  </tr>
+                  <tr>
+                    <td>Email</td>
+                    <td class="has-text-centered"><strong>8.24</strong></td>
+                    <td class="has-text-centered">8.03</td>
+                  </tr>
+                  <tr>
+                    <td>Narrative</td>
+                    <td class="has-text-centered"><strong>8.28</strong></td>
+                    <td class="has-text-centered">8.05</td>
+                  </tr>
+                  <tr>
+                    <td>Technical Writing</td>
+                    <td class="has-text-centered"><strong>8.30</strong></td>
+                    <td class="has-text-centered">8.07</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p class="help has-text-centered" style="margin-top: 10px;">
+            <strong>Detailed WritingBench scores (out of 10) by domain and document type.</strong> IntelliAsk-32B consistently outperforms Qwen3-32B across all categories.
           </p>
         </div>
       </div>
     </div>
-    <!--/ Related Work. -->
+    <!--/ Evaluation Results -->
+
+
 
   </div>
 </section>
@@ -293,11 +692,12 @@
 <section class="section" id="BibTeX">
   <div class="container is-max-desktop content">
     <h2 class="title">BibTeX</h2>
-    <pre><code>@article{intelliask2026,
-  author    = {First Author and Second Author},
-  title     = {IntelliAsk: Learning to Ask Critical Questions with Human-Aligned Rewards},
-  journal   = {ACL},
+    <pre><code>@inproceedings{intelliask2026,
+  author    = {Anonymous Authors},
+  title     = {Preference Optimization for Review Question Generation Improves Writing Quality},
+  booktitle = {Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL)},
   year      = {2026},
+  url       = {https://anonymous.4open.science/r/IntelliA-3E09/}
 }</code></pre>
   </div>
 </section>

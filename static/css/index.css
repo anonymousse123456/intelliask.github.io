@@ -155,3 +155,61 @@ body {
 #interpolation-image-wrapper img {
   border-radius: 5px;
 }
+
+.carousel-caption {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+  padding: 10px 20px;
+  margin-top: 10px;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+/* Demo Area Styling */
+.demo-container {
+  padding: 20px 0;
+}
+
+.upload-box {
+  border: 2px dashed #dbdbdb;
+  border-radius: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+  border-color: #3273dc;
+  background-color: #f5f8ff;
+}
+
+.upload-text {
+  font-size: 1.1rem;
+  color: #363636;
+  margin-bottom: 0;
+}
+
+.generation-area {
+  padding: 20px;
+  background-color: #fafafa;
+  border-radius: 10px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.question-output {
+  flex-grow: 1;
+  margin-bottom: 15px;
+}
+
+/* Table Styling Enhancements */
+.table th {
+  font-weight: 600;
+  color: #363636;
+}
+
+.table td strong {
+  color: #3273dc;
+}
