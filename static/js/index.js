@@ -41,7 +41,7 @@ $(document).ready(function() {
     // For GitHub Pages: use deployed Vercel backend
     const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5000/api'
-        : 'https://intelliask-backend-lo11clj4q-koooos-projects.vercel.app/api';  // TODO: Replace with your Vercel URL after deployment
+        : 'https://intelliask-backend.vercel.app/api';  // Production Vercel backend
     let selectedFile = null;
 
     // Handle file selection
