@@ -2,7 +2,7 @@
 Vercel Serverless Function for IntelliAsk PDF Processing
 This file handles PDF upload, OCR, and question generation
 """
-from flask import Flask, request, jsonify
+from flask import Flask, Request, Response, request, jsonify
 import pathlib
 import tempfile
 import os
@@ -75,19 +75,20 @@ def generate_questions_with_modal(research_paper_text):
     except Exception as e:
         raise Exception(f"Modal inference failed: {str(e)}")
 
-# Vercel serverless function handler
+# Create Flask app
 app = Flask(__name__)
 
-@app.route('/api/upload', methods=['POST'])
-def handler(request):
-    """Main handler for Vercel serverless function"""
-    # Handle CORS
+@app.route('/api/upload', methods=['POST', 'OPTIONS'])
+def upload():
+    """Handle PDF upload and processing"""
+    # Handle CORS preflight
     if request.method == 'OPTIONS':
-        return '', 204, {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-        }
+        response = Response()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        response.status_code = 204
+        return response
 
     try:
         # Check if file is present
@@ -132,3 +133,6 @@ def handler(request):
         })
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response, 500
+
+# For Vercel
+handler = app
