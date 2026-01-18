@@ -4,35 +4,19 @@ $(document).ready(function() {
       $(".navbar-menu").toggleClass("is-active");
     });
 
-    var options = {
+    var carousels = bulmaCarousel.attach('.carousel', {
         slidesToScroll: 1,
         slidesToShow: 3,
         loop: true,
         infinite: true,
-        autoplay: false,
-        autoplaySpeed: 3000,
-    }
-
-    var carousels = bulmaCarousel.attach('.carousel', options);
-
-    for(var i = 0; i < carousels.length; i++) {
-        carousels[i].on('before:show', state => {
-            console.log(state);
-        });
-    }
-
-    var element = document.querySelector('#my-element');
-    if (element && element.bulmaCarousel) {
-        element.bulmaCarousel.on('before-show', function(state) {
-            console.log(state);
-        });
-    }
+        autoplay: false
+    });
 
     initIntelliAskDemo();
 });
 
 function initIntelliAskDemo() {
-    const API_ENDPOINT = 'https://api.bbnschool.in/api/generate-question';
+    const API_BASE = 'https://api.bbnschool.in';
 
     const fileInput = document.getElementById('paper-upload');
     const generateBtn = document.getElementById('generate-btn');
@@ -44,132 +28,131 @@ function initIntelliAskDemo() {
 
     let selectedFile = null;
 
+    const steps = [
+        { name: 'Queued', desc: 'Waiting to start...' },
+        { name: 'Trimming PDF', desc: 'Processing pages...' },
+        { name: 'Extracting Text', desc: 'Gemini is reading your paper...' },
+        { name: 'Generating Question', desc: 'IntelliAsk is thinking...' },
+        { name: 'Complete', desc: 'Done!' }
+    ];
+
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (file) {
-            if (!file.name.toLowerCase().endsWith('.pdf')) {
-                alert('Please select a PDF file.');
-                return;
-            }
-            if (file.size > 20 * 1024 * 1024) {
-                alert('File size must be less than 20MB.');
-                return;
-            }
-            selectedFile = file;
-
-            if (uploadArea) {
-                uploadArea.classList.add('file-selected');
-                const uploadIcon = uploadArea.querySelector('.upload-icon');
-                const uploadText = uploadArea.querySelector('.upload-text');
-                if (uploadIcon) uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-                if (uploadText) {
-                    uploadText.innerHTML = '<span id="file-name">' + file.name + '</span><span class="file-size">' + (file.size / 1024 / 1024).toFixed(2) + ' MB</span>';
-                }
-            }
-
-            generateBtn.disabled = false;
-            generateBtn.classList.remove('is-light');
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            alert('Please select a PDF file.');
+            return;
         }
+        if (file.size > 20 * 1024 * 1024) {
+            alert('File size must be less than 20MB.');
+            return;
+        }
+        selectedFile = file;
+        uploadArea.classList.add('file-selected');
+        uploadArea.querySelector('.upload-icon').innerHTML = '<i class="fas fa-check-circle"></i>';
+        uploadArea.querySelector('.upload-text').innerHTML = '<span>' + file.name + '</span><span class="file-size">' + (file.size / 1024 / 1024).toFixed(2) + ' MB</span>';
+        generateBtn.disabled = false;
+        generateBtn.classList.remove('is-light');
     });
 
     if (uploadArea) {
-        uploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            uploadArea.classList.add('drag-over');
-        });
-        uploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-        });
+        uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+        uploadArea.addEventListener('dragleave', function(e) { e.preventDefault(); uploadArea.classList.remove('drag-over'); });
         uploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
             uploadArea.classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file) {
+            if (e.dataTransfer.files[0]) {
                 const dt = new DataTransfer();
-                dt.items.add(file);
+                dt.items.add(e.dataTransfer.files[0]);
                 fileInput.files = dt.files;
                 fileInput.dispatchEvent(new Event('change'));
             }
         });
     }
 
-    generateBtn.addEventListener('click', async function() {
-        if (!selectedFile) {
-            alert('Please upload a PDF file first.');
-            return;
+    function renderProgress(step) {
+        const s = steps[step] || steps[0];
+        let html = '<div class="loading-state"><div class="step-progress">';
+        for (let i = 1; i <= 4; i++) {
+            const cls = i < step ? 'done' : (i === step ? 'active' : '');
+            html += '<div class="step-item ' + cls + '"><div class="step-num">' + (i < step ? '✓' : i) + '</div></div>';
+            if (i < 4) html += '<div class="step-line ' + (i < step ? 'done' : '') + '"></div>';
         }
+        html += '</div><div class="loading-text"><strong>' + s.name + '</strong><p>' + s.desc + '</p></div></div>';
+        progressContainer.innerHTML = html;
+    }
+
+    async function pollStatus(jobId) {
+        try {
+            const res = await fetch(API_BASE + '/api/status/' + jobId);
+            const data = await res.json();
+
+            if (data.error && !data.status) {
+                showError(data.error);
+                return;
+            }
+
+            renderProgress(data.step);
+
+            if (data.status === 'completed') {
+                showResult(data.question, data.metadata);
+            } else if (data.status === 'error') {
+                showError(data.error || 'Processing failed');
+            } else {
+                setTimeout(() => pollStatus(jobId), 1000);
+            }
+        } catch (e) {
+            showError('Connection error. Please try again.');
+        }
+    }
+
+    function showResult(question, metadata) {
+        progressContainer.style.display = 'none';
+        resultContainer.style.display = 'block';
+        let meta = '';
+        if (metadata) {
+            meta = '<div class="result-meta"><span><i class="fas fa-file-alt"></i> ' + metadata.processed_pages + ' pages</span>';
+            if (metadata.was_trimmed) meta += '<span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + metadata.original_pages + '</span>';
+            meta += '</div>';
+        }
+        resultContainer.innerHTML = '<div class="result-success"><div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Generated Question</span></div><div class="result-question">' + escapeHtml(question) + '</div>' + meta + '</div>';
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<span>Generate Another</span><i class="fas fa-arrow-right"></i>';
+    }
+
+    function showError(msg) {
+        progressContainer.style.display = 'none';
+        resultContainer.style.display = 'block';
+        resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(msg) + '</p></div>';
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
+    }
+
+    generateBtn.addEventListener('click', async function() {
+        if (!selectedFile) return;
 
         generateBtn.disabled = true;
-        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
-
-        if (progressContainer) {
-            progressContainer.style.display = 'block';
-            progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Processing your paper...</strong><p>This may take up to 2 minutes (server cold start)</p></div></div>';
-        }
-        if (resultContainer) resultContainer.style.display = 'none';
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Submitting...</span>';
+        progressContainer.style.display = 'block';
+        resultContainer.style.display = 'none';
+        renderProgress(0);
 
         const formData = new FormData();
         formData.append('file', selectedFile);
 
-        // Use AbortController for timeout (5 minutes)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 300000);
-
         try {
-            const response = await fetch(API_ENDPOINT, {
-                method: 'POST',
-                body: formData,
-                signal: controller.signal
-            });
+            const res = await fetch(API_BASE + '/api/submit', { method: 'POST', body: formData });
+            const data = await res.json();
 
-            clearTimeout(timeoutId);
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || 'Failed to generate question');
-            }
-
-            if (data.success && data.question) {
-                if (progressContainer) progressContainer.style.display = 'none';
-                if (resultContainer) {
-                    resultContainer.style.display = 'block';
-
-                    let metaHtml = '';
-                    if (data.metadata) {
-                        metaHtml = '<div class="result-meta"><span><i class="fas fa-file-alt"></i> ' + data.metadata.processed_pages + ' pages analyzed</span>';
-                        if (data.metadata.was_trimmed) {
-                            metaHtml += '<span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + data.metadata.original_pages + ' pages</span>';
-                        }
-                        metaHtml += '</div>';
-                    }
-
-                    resultContainer.innerHTML = '<div class="result-success"><div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Generated Question</span></div><div class="result-question">' + escapeHtml(data.question) + '</div>' + metaHtml + '</div>';
-                }
-
-                generateBtn.innerHTML = '<span>Generate Another</span><i class="fas fa-arrow-right"></i>';
+            if (data.job_id) {
+                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
+                pollStatus(data.job_id);
             } else {
-                throw new Error('Unexpected response format');
+                showError('Failed to submit job');
             }
-        } catch (error) {
-            clearTimeout(timeoutId);
-            console.error('Error:', error);
-
-            if (progressContainer) progressContainer.style.display = 'none';
-            if (resultContainer) {
-                resultContainer.style.display = 'block';
-                let msg = error.message || 'Something went wrong.';
-                if (error.name === 'AbortError') {
-                    msg = 'Request timed out. The server may be busy. Please try again.';
-                }
-                resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(msg) + '</p></div>';
-            }
-
-            generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
+        } catch (e) {
+            showError('Connection error');
         }
-
-        generateBtn.disabled = false;
     });
 
     function escapeHtml(text) {

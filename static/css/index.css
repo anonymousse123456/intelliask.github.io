@@ -340,19 +340,57 @@ body {
   text-align: center;
 }
 
-.loading-spinner {
-  font-size: 3rem;
-  color: #667eea;
-  margin-bottom: 20px;
+.step-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
-.loading-spinner i {
-  animation: spin 1s linear infinite;
+.step-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.step-item.active .step-num {
+  background: #667eea;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.step-item.done .step-num {
+  background: #22c55e;
+  color: white;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.step-line {
+  width: 40px;
+  height: 3px;
+  background: #e0e0e0;
+  margin: 0 8px;
+}
+
+.step-line.done {
+  background: #22c55e;
 }
 
 .loading-text strong {
