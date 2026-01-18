@@ -1,73 +1,96 @@
 $(document).ready(function() {
-    // Check for click events on the navbar burger icon
     $(".navbar-burger").click(function() {
-      // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
       $(".navbar-burger").toggleClass("is-active");
       $(".navbar-menu").toggleClass("is-active");
     });
 
     var options = {
-			slidesToScroll: 1,
-			slidesToShow: 3,
-			loop: true,
-			infinite: true,
-			autoplay: false,
-			autoplaySpeed: 3000,
+        slidesToScroll: 1,
+        slidesToShow: 3,
+        loop: true,
+        infinite: true,
+        autoplay: false,
+        autoplaySpeed: 3000,
     }
 
-		// Initialize all div with carousel class
     var carousels = bulmaCarousel.attach('.carousel', options);
 
-    // Loop on each carousel initialized
     for(var i = 0; i < carousels.length; i++) {
-    	// Add listener to event
-    	carousels[i].on('before:show', state => {
-    		console.log(state);
-    	});
+        carousels[i].on('before:show', state => {
+            console.log(state);
+        });
     }
 
-    // Access to bulmaCarousel instance of an element
     var element = document.querySelector('#my-element');
     if (element && element.bulmaCarousel) {
-    	// bulmaCarousel instance is available as element.bulmaCarousel
-    	element.bulmaCarousel.on('before-show', function(state) {
-    		console.log(state);
-    	});
+        element.bulmaCarousel.on('before-show', function(state) {
+            console.log(state);
+        });
     }
 
-    // IntelliAsk Demo functionality
     initIntelliAskDemo();
 });
 
 function initIntelliAskDemo() {
     const API_ENDPOINT = 'https://api.bbnschool.in/api/generate-question';
+    const demoSection = document.querySelector('.demo-container');
+    if (!demoSection) return;
+
     const fileInput = document.getElementById('paper-upload');
-    const generateBtn = document.querySelector('.generation-area .button.is-success');
-    const questionOutput = document.querySelector('.question-output .notification');
-    const uploadBox = document.querySelector('.upload-box');
+    const generateBtn = document.getElementById('generate-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const resultContainer = document.getElementById('result-container');
+    const uploadArea = document.getElementById('upload-area');
+
     let selectedFile = null;
 
-    if (!fileInput || !generateBtn || !questionOutput) return;
+    if (!fileInput || !generateBtn) return;
 
-    // Handle file selection
+    // Drag and drop
+    if (uploadArea) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file) handleFileSelect(file);
+        });
+    }
+
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (file) {
-            if (!file.name.toLowerCase().endsWith('.pdf')) {
-                showError('Please select a PDF file.');
-                return;
-            }
-            if (file.size > 20 * 1024 * 1024) {
-                showError('File size must be less than 20MB.');
-                return;
-            }
-            selectedFile = file;
-            updateUploadUI(file);
-            generateBtn.disabled = false;
-        }
+        if (file) handleFileSelect(file);
     });
 
-    // Handle generate button click
+    function handleFileSelect(file) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            showError('Please select a PDF file.');
+            return;
+        }
+        if (file.size > 20 * 1024 * 1024) {
+            showError('File size must be less than 20MB.');
+            return;
+        }
+        selectedFile = file;
+        updateUploadUI(file);
+        generateBtn.disabled = false;
+        generateBtn.classList.remove('is-light');
+    }
+
     generateBtn.addEventListener('click', async function() {
         if (!selectedFile) {
             showError('Please upload a PDF file first.');
@@ -77,72 +100,116 @@ function initIntelliAskDemo() {
     });
 
     function updateUploadUI(file) {
-        const uploadText = uploadBox.querySelector('.upload-text');
-        if (uploadText) {
-            uploadText.innerHTML = `<strong>Selected:</strong> ${escapeHtml(file.name)}<br><small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>`;
-        }
-        uploadBox.style.borderColor = '#48c774';
-        uploadBox.style.backgroundColor = '#f0fff4';
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const uploadIcon = uploadArea.querySelector('.upload-icon');
+        const uploadText = uploadArea.querySelector('.upload-text');
+
+        if (fileName) fileName.textContent = file.name;
+        if (fileSize) fileSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+
+        uploadArea.classList.add('file-selected');
+        if (uploadIcon) uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+        if (uploadText) uploadText.innerHTML = `<span id="file-name">${escapeHtml(file.name)}</span><span id="file-size" class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</span>`;
     }
 
     function showError(message) {
-        questionOutput.className = 'notification is-danger is-light';
-        questionOutput.style.minHeight = '150px';
-        questionOutput.style.display = 'flex';
-        questionOutput.style.alignItems = 'center';
-        questionOutput.style.justifyContent = 'center';
-        questionOutput.innerHTML = `<p style="text-align: center;"><i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>${escapeHtml(message)}</p>`;
-    }
-
-    function showLoading() {
-        questionOutput.className = 'notification is-info is-light';
-        questionOutput.style.minHeight = '150px';
-        questionOutput.style.display = 'flex';
-        questionOutput.style.alignItems = 'center';
-        questionOutput.style.justifyContent = 'center';
-        questionOutput.innerHTML = `
-            <div style="text-align: center;">
-                <p><i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px;"></i></p>
-                <p><strong>Generating question...</strong></p>
-                <p class="is-size-7 has-text-grey">This may take a moment as we analyze your paper.</p>
+        resultContainer.innerHTML = `
+            <div class="result-error">
+                <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
+                <p class="error-message">${escapeHtml(message)}</p>
             </div>
         `;
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<span class="icon"><i class="fas fa-spinner fa-spin"></i></span><span>Processing...</span>';
+        resultContainer.style.display = 'block';
+        progressContainer.style.display = 'none';
+        resetButton();
     }
 
-    function showQuestion(question, metadata) {
-        questionOutput.className = 'notification is-success is-light';
-        questionOutput.style.minHeight = 'auto';
-        questionOutput.style.display = 'block';
-        questionOutput.style.alignItems = '';
-        questionOutput.style.justifyContent = '';
+    function showProgress(steps) {
+        progressContainer.style.display = 'block';
+        resultContainer.style.display = 'none';
 
-        let metaInfo = '';
-        if (metadata) {
-            metaInfo = `<p class="is-size-7 has-text-grey" style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px;">
-                <i class="fas fa-file-alt"></i> Processed ${metadata.processed_pages} pages
-                ${metadata.was_trimmed ? ' (trimmed from ' + metadata.original_pages + ')' : ''}
-            </p>`;
+        const stepsHtml = steps.map((step, i) => `
+            <div class="progress-step ${step.status}" id="step-${i}">
+                <div class="step-indicator">
+                    ${step.status === 'active' ? '<i class="fas fa-spinner fa-spin"></i>' :
+                      step.status === 'complete' ? '<i class="fas fa-check"></i>' :
+                      '<span class="step-number">' + (i + 1) + '</span>'}
+                </div>
+                <div class="step-content">
+                    <span class="step-title">${step.title}</span>
+                    <span class="step-desc">${step.desc}</span>
+                </div>
+            </div>
+        `).join('');
+
+        progressContainer.innerHTML = `<div class="progress-steps">${stepsHtml}</div>`;
+    }
+
+    function updateStep(index, status, desc) {
+        const step = document.getElementById(`step-${index}`);
+        if (!step) return;
+
+        step.className = `progress-step ${status}`;
+        const indicator = step.querySelector('.step-indicator');
+        const descEl = step.querySelector('.step-desc');
+
+        if (status === 'active') {
+            indicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        } else if (status === 'complete') {
+            indicator.innerHTML = '<i class="fas fa-check"></i>';
         }
 
-        questionOutput.innerHTML = `
-            <h4 class="title is-5" style="margin-bottom: 10px;"><i class="fas fa-question-circle" style="margin-right: 8px;"></i>Generated Question</h4>
-            <div class="content" style="white-space: pre-wrap; font-size: 0.95rem;">${escapeHtml(question)}</div>
-            ${metaInfo}
-        `;
-
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = '<span class="icon"><i class="fas fa-magic"></i></span><span>Generate Another Question</span>';
+        if (desc) descEl.textContent = desc;
     }
 
-    function resetUI() {
+    function showResult(question, metadata) {
+        progressContainer.style.display = 'none';
+        resultContainer.style.display = 'block';
+
+        let metaHtml = '';
+        if (metadata) {
+            metaHtml = `
+                <div class="result-meta">
+                    <span><i class="fas fa-file-alt"></i> ${metadata.processed_pages} pages analyzed</span>
+                    ${metadata.was_trimmed ? `<span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ${metadata.original_pages}</span>` : ''}
+                </div>
+            `;
+        }
+
+        resultContainer.innerHTML = `
+            <div class="result-success">
+                <div class="result-header">
+                    <span class="result-badge"><i class="fas fa-lightbulb"></i> Generated Question</span>
+                </div>
+                <div class="result-question">${escapeHtml(question)}</div>
+                ${metaHtml}
+            </div>
+        `;
+
+        resetButton();
+        generateBtn.innerHTML = '<span>Generate Another</span><i class="fas fa-arrow-right"></i>';
+    }
+
+    function resetButton() {
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '<span class="icon"><i class="fas fa-magic"></i></span><span>Generate Questions with IntelliAsk</span>';
+        generateBtn.classList.remove('is-loading');
+        if (!generateBtn.innerHTML.includes('Another')) {
+            generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
+        }
     }
 
     async function generateQuestion() {
-        showLoading();
+        generateBtn.disabled = true;
+        generateBtn.classList.add('is-loading');
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
+
+        const steps = [
+            { title: 'Preparing', desc: 'Validating document...', status: 'active' },
+            { title: 'Extracting', desc: 'OCR with Gemini', status: 'pending' },
+            { title: 'Generating', desc: 'IntelliAsk-32B', status: 'pending' }
+        ];
+        showProgress(steps);
 
         const formData = new FormData();
         formData.append('file', selectedFile);
@@ -153,27 +220,74 @@ function initIntelliAskDemo() {
                 body: formData,
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
-                throw new Error(data.detail || 'Failed to generate question');
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || 'Failed to generate question');
             }
 
-            if (data.success && data.question) {
-                showQuestion(data.question, data.metadata);
-            } else {
-                throw new Error('Unexpected response format');
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(6));
+                            handleSSEEvent(data);
+                        } catch (e) {
+                            console.error('Parse error:', e);
+                        }
+                    }
+                }
             }
         } catch (error) {
             console.error('Error:', error);
             if (error.message.includes('Rate limit')) {
-                showError('Rate limit exceeded. Please wait a moment and try again.');
+                showError('Rate limit reached. Please wait a moment.');
             } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-                showError('Could not connect to the server. Please check your connection and try again.');
+                showError('Connection failed. Please try again.');
             } else {
-                showError(error.message || 'An error occurred. Please try again.');
+                showError(error.message || 'Something went wrong.');
             }
-            resetUI();
+        }
+    }
+
+    function handleSSEEvent(data) {
+        switch (data.step) {
+            case 'trimming':
+                updateStep(0, 'active', 'Preparing document...');
+                break;
+            case 'trimmed':
+                updateStep(0, 'complete', data.was_trimmed ? `Trimmed to 9 pages` : 'Document ready');
+                updateStep(1, 'active', 'Extracting text...');
+                break;
+            case 'ocr':
+                updateStep(1, 'active', 'Extracting text with Gemini...');
+                break;
+            case 'ocr_done':
+                updateStep(1, 'complete', 'Text extracted');
+                updateStep(2, 'active', 'Generating with IntelliAsk-32B...');
+                break;
+            case 'generating':
+                updateStep(2, 'active', 'This may take up to 2 minutes...');
+                break;
+            case 'complete':
+                updateStep(2, 'complete', 'Complete');
+                setTimeout(() => {
+                    showResult(data.question, data.metadata);
+                }, 500);
+                break;
+            case 'error':
+                showError(data.message);
+                break;
         }
     }
 
