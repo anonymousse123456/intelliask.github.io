@@ -33,8 +33,6 @@ $(document).ready(function() {
 
 function initIntelliAskDemo() {
     const API_ENDPOINT = 'https://api.bbnschool.in/api/generate-question';
-    const demoSection = document.querySelector('.demo-container');
-    if (!demoSection) return;
 
     const fileInput = document.getElementById('paper-upload');
     const generateBtn = document.getElementById('generate-btn');
@@ -42,116 +40,98 @@ function initIntelliAskDemo() {
     const resultContainer = document.getElementById('result-container');
     const uploadArea = document.getElementById('upload-area');
 
+    if (!fileInput || !generateBtn) return;
+
     let selectedFile = null;
 
-    if (!fileInput || !generateBtn) return;
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                alert('Please select a PDF file.');
+                return;
+            }
+            if (file.size > 20 * 1024 * 1024) {
+                alert('File size must be less than 20MB.');
+                return;
+            }
+            selectedFile = file;
+
+            // Update UI to show file selected
+            if (uploadArea) {
+                uploadArea.classList.add('file-selected');
+                const uploadIcon = uploadArea.querySelector('.upload-icon');
+                const uploadText = uploadArea.querySelector('.upload-text');
+                if (uploadIcon) uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                if (uploadText) {
+                    uploadText.innerHTML = '<span id="file-name">' + file.name + '</span><span class="file-size">' + (file.size / 1024 / 1024).toFixed(2) + ' MB</span>';
+                }
+            }
+
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('is-light');
+        }
+    });
 
     // Drag and drop
     if (uploadArea) {
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, preventDefaults, false);
-        });
-
-        function preventDefaults(e) {
+        uploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
+            uploadArea.classList.add('drag-over');
         });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
         });
-
-        uploadArea.addEventListener('drop', (e) => {
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
             const file = e.dataTransfer.files[0];
-            if (file) handleFileSelect(file);
+            if (file) {
+                // Trigger the file input change
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
         });
     }
 
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) handleFileSelect(file);
-    });
-
-    function handleFileSelect(file) {
-        if (!file.name.toLowerCase().endsWith('.pdf')) {
-            showError('Please select a PDF file.');
-            return;
-        }
-        if (file.size > 20 * 1024 * 1024) {
-            showError('File size must be less than 20MB.');
-            return;
-        }
-        selectedFile = file;
-        updateUploadUI(file);
-        generateBtn.disabled = false;
-        generateBtn.classList.remove('is-light');
-    }
-
+    // Generate button click
     generateBtn.addEventListener('click', async function() {
         if (!selectedFile) {
-            showError('Please upload a PDF file first.');
+            alert('Please upload a PDF file first.');
             return;
         }
-        await generateQuestion();
-    });
 
-    function updateUploadUI(file) {
-        const uploadIcon = uploadArea.querySelector('.upload-icon');
-        const uploadText = uploadArea.querySelector('.upload-text');
-
-        uploadArea.classList.add('file-selected');
-        if (uploadIcon) uploadIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-        if (uploadText) uploadText.innerHTML = '<span id="file-name">' + escapeHtml(file.name) + '</span><span class="file-size">' + (file.size / 1024 / 1024).toFixed(2) + ' MB</span>';
-    }
-
-    function showError(message) {
-        resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(message) + '</p></div>';
-        resultContainer.style.display = 'block';
-        progressContainer.style.display = 'none';
-        resetButton();
-    }
-
-    function showLoading() {
-        progressContainer.style.display = 'block';
-        resultContainer.style.display = 'none';
-
-        progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Analyzing your paper...</strong><p>Extracting text and generating question. This may take 1-2 minutes.</p></div></div>';
-    }
-
-    function showResult(question, metadata) {
-        progressContainer.style.display = 'none';
-        resultContainer.style.display = 'block';
-
-        let metaHtml = '';
-        if (metadata) {
-            metaHtml = '<div class="result-meta"><span><i class="fas fa-file-alt"></i> ' + metadata.processed_pages + ' pages analyzed</span>' + (metadata.was_trimmed ? '<span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + metadata.original_pages + '</span>' : '') + '</div>';
-        }
-
-        resultContainer.innerHTML = '<div class="result-success"><div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Generated Question</span></div><div class="result-question">' + escapeHtml(question) + '</div>' + metaHtml + '</div>';
-
-        resetButton();
-        generateBtn.innerHTML = '<span>Generate Another</span><i class="fas fa-arrow-right"></i>';
-    }
-
-    function resetButton() {
-        generateBtn.disabled = false;
-        generateBtn.classList.remove('is-loading');
-        if (!generateBtn.innerHTML.includes('Another')) {
-            generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
-        }
-    }
-
-    async function generateQuestion() {
+        // Show loading
         generateBtn.disabled = true;
-        generateBtn.classList.add('is-loading');
         generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
 
-        showLoading();
+        if (progressContainer) {
+            progressContainer.style.display = 'block';
+            progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Step 1: Preparing document...</strong><p>Validating and processing your PDF</p></div></div>';
+        }
+        if (resultContainer) resultContainer.style.display = 'none';
 
+        // Simulate step progression
+        let currentStep = 1;
+        const stepMessages = [
+            { title: 'Step 1: Preparing document...', desc: 'Validating and processing your PDF' },
+            { title: 'Step 2: Extracting text...', desc: 'Gemini is reading your paper' },
+            { title: 'Step 3: Generating question...', desc: 'IntelliAsk is analyzing the content' }
+        ];
+
+        const stepTimer = setInterval(function() {
+            currentStep++;
+            if (currentStep <= 3 && progressContainer) {
+                const step = stepMessages[currentStep - 1];
+                progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>' + step.title + '</strong><p>' + step.desc + '</p></div></div>';
+            }
+        }, 5000);
+
+        // Make the API call
         const formData = new FormData();
         formData.append('file', selectedFile);
 
@@ -161,6 +141,8 @@ function initIntelliAskDemo() {
                 body: formData,
             });
 
+            clearInterval(stepTimer);
+
             const data = await response.json();
 
             if (!response.ok) {
@@ -168,21 +150,42 @@ function initIntelliAskDemo() {
             }
 
             if (data.success && data.question) {
-                showResult(data.question, data.metadata);
+                // Show result
+                if (progressContainer) progressContainer.style.display = 'none';
+                if (resultContainer) {
+                    resultContainer.style.display = 'block';
+
+                    let metaHtml = '';
+                    if (data.metadata) {
+                        metaHtml = '<div class="result-meta"><span><i class="fas fa-file-alt"></i> ' + data.metadata.processed_pages + ' pages analyzed</span>';
+                        if (data.metadata.was_trimmed) {
+                            metaHtml += '<span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + data.metadata.original_pages + ' pages</span>';
+                        }
+                        metaHtml += '</div>';
+                    }
+
+                    resultContainer.innerHTML = '<div class="result-success"><div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Generated Question</span></div><div class="result-question">' + escapeHtml(data.question) + '</div>' + metaHtml + '</div>';
+                }
+
+                generateBtn.innerHTML = '<span>Generate Another</span><i class="fas fa-arrow-right"></i>';
             } else {
                 throw new Error('Unexpected response format');
             }
         } catch (error) {
+            clearInterval(stepTimer);
             console.error('Error:', error);
-            if (error.message.includes('Rate limit')) {
-                showError('Rate limit reached. Please wait a moment.');
-            } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-                showError('Connection failed. Please try again.');
-            } else {
-                showError(error.message || 'Something went wrong.');
+
+            if (progressContainer) progressContainer.style.display = 'none';
+            if (resultContainer) {
+                resultContainer.style.display = 'block';
+                resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(error.message || 'Something went wrong.') + '</p></div>';
             }
+
+            generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
         }
-    }
+
+        generateBtn.disabled = false;
+    });
 
     function escapeHtml(text) {
         const div = document.createElement('div');
