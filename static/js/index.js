@@ -44,7 +44,6 @@ function initIntelliAskDemo() {
 
     let selectedFile = null;
 
-    // File input change
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -58,7 +57,6 @@ function initIntelliAskDemo() {
             }
             selectedFile = file;
 
-            // Update UI to show file selected
             if (uploadArea) {
                 uploadArea.classList.add('file-selected');
                 const uploadIcon = uploadArea.querySelector('.upload-icon');
@@ -74,7 +72,6 @@ function initIntelliAskDemo() {
         }
     });
 
-    // Drag and drop
     if (uploadArea) {
         uploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
@@ -97,32 +94,36 @@ function initIntelliAskDemo() {
         });
     }
 
-    // Generate button click
     generateBtn.addEventListener('click', async function() {
         if (!selectedFile) {
             alert('Please upload a PDF file first.');
             return;
         }
 
-        // Show loading
         generateBtn.disabled = true;
         generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
 
         if (progressContainer) {
             progressContainer.style.display = 'block';
-            progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Processing your paper...</strong><p>This may take up to 2 minutes</p></div></div>';
+            progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Processing your paper...</strong><p>This may take up to 2 minutes (server cold start)</p></div></div>';
         }
         if (resultContainer) resultContainer.style.display = 'none';
 
-        // Make the API call
         const formData = new FormData();
         formData.append('file', selectedFile);
+
+        // Use AbortController for timeout (5 minutes)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 300000);
 
         try {
             const response = await fetch(API_ENDPOINT, {
                 method: 'POST',
                 body: formData,
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
 
             const data = await response.json();
 
@@ -131,7 +132,6 @@ function initIntelliAskDemo() {
             }
 
             if (data.success && data.question) {
-                // Show result
                 if (progressContainer) progressContainer.style.display = 'none';
                 if (resultContainer) {
                     resultContainer.style.display = 'block';
@@ -153,12 +153,17 @@ function initIntelliAskDemo() {
                 throw new Error('Unexpected response format');
             }
         } catch (error) {
+            clearTimeout(timeoutId);
             console.error('Error:', error);
 
             if (progressContainer) progressContainer.style.display = 'none';
             if (resultContainer) {
                 resultContainer.style.display = 'block';
-                resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(error.message || 'Something went wrong.') + '</p></div>';
+                let msg = error.message || 'Something went wrong.';
+                if (error.name === 'AbortError') {
+                    msg = 'Request timed out. The server may be busy. Please try again.';
+                }
+                resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(msg) + '</p></div>';
             }
 
             generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
