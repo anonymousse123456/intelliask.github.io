@@ -89,7 +89,6 @@ function initIntelliAskDemo() {
             uploadArea.classList.remove('drag-over');
             const file = e.dataTransfer.files[0];
             if (file) {
-                // Trigger the file input change
                 const dt = new DataTransfer();
                 dt.items.add(file);
                 fileInput.files = dt.files;
@@ -111,25 +110,9 @@ function initIntelliAskDemo() {
 
         if (progressContainer) {
             progressContainer.style.display = 'block';
-            progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Step 1: Preparing document...</strong><p>Validating and processing your PDF</p></div></div>';
+            progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>Processing your paper...</strong><p>This may take up to 2 minutes</p></div></div>';
         }
         if (resultContainer) resultContainer.style.display = 'none';
-
-        // Simulate step progression
-        let currentStep = 1;
-        const stepMessages = [
-            { title: 'Step 1: Preparing document...', desc: 'Validating and processing your PDF' },
-            { title: 'Step 2: Extracting text...', desc: 'Gemini is reading your paper' },
-            { title: 'Step 3: Generating question...', desc: 'IntelliAsk is analyzing the content' }
-        ];
-
-        const stepTimer = setInterval(function() {
-            currentStep++;
-            if (currentStep <= 3 && progressContainer) {
-                const step = stepMessages[currentStep - 1];
-                progressContainer.innerHTML = '<div class="loading-state"><div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i></div><div class="loading-text"><strong>' + step.title + '</strong><p>' + step.desc + '</p></div></div>';
-            }
-        }, 5000);
 
         // Make the API call
         const formData = new FormData();
@@ -140,8 +123,6 @@ function initIntelliAskDemo() {
                 method: 'POST',
                 body: formData,
             });
-
-            clearInterval(stepTimer);
 
             const data = await response.json();
 
@@ -172,7 +153,6 @@ function initIntelliAskDemo() {
                 throw new Error('Unexpected response format');
             }
         } catch (error) {
-            clearInterval(stepTimer);
             console.error('Error:', error);
 
             if (progressContainer) progressContainer.style.display = 'none';
