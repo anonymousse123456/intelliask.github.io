@@ -31,7 +31,7 @@ function initIntelliAskDemo() {
     const steps = [
         { name: 'Queued', desc: 'Waiting to start...' },
         { name: 'Trimming PDF', desc: 'Processing pages...' },
-        { name: 'Extracting Text', desc: 'Gemini is reading your paper...' },
+        { name: 'Extracting Text', desc: 'Reading your paper...' },
         { name: 'Generating Question', desc: 'IntelliAsk is thinking...' },
         { name: 'Complete', desc: 'Done!' }
     ];
