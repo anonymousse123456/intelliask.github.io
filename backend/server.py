@@ -16,7 +16,7 @@ gemini_client = genai.Client(api_key=os.environ.get('GEMINI_API_KEY'))
 
 # Initialize OpenAI client for Modal endpoint
 modal_client = OpenAI(
-    base_url="https://mailto-karun-py--intelliask-qwen3-32b-inference-01uberco-a01a74.modal.run/v1",
+    base_url="https://mailto-karun-py--intelliask-qwen3-32b-gpu-snapshot-snapp-d10560.modal.run/v1",
     api_key="dummy"  # vLLM doesn't require auth by default
 )
 
@@ -60,7 +60,7 @@ def generate_questions_with_modal(research_paper_text):
     """Generate questions using Modal-hosted IntelliAsk model"""
     try:
         response = modal_client.chat.completions.create(
-            model="intelliask",
+            model="anonymousatom/IntelliAsk-Qwen3-32B-450-Merged",
             messages=[{
                 "role": "user",
                 "content": f"Generate critical peer review questions after reading the below research paper:\n\n{research_paper_text}"
