@@ -13,7 +13,47 @@ $(document).ready(function() {
     });
 
     initIntelliAskDemo();
+    initTableOfContents();
 });
+
+function initTableOfContents() {
+    const toc = document.getElementById('toc-nav');
+    if (!toc) return;
+
+    const tocItems = document.querySelectorAll('.toc-item');
+
+    // Show TOC when user scrolls down
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+            toc.classList.add('visible');
+        } else {
+            toc.classList.remove('visible');
+        }
+
+        // Highlight active section
+        tocItems.forEach(item => {
+            const target = document.getElementById(item.dataset.target);
+            if (target) {
+                const rect = target.getBoundingClientRect();
+                if (rect.top <= 100 && rect.bottom >= 100) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            }
+        });
+    });
+
+    // Smooth scroll to section on click
+    tocItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const target = document.getElementById(this.dataset.target);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+}
 
 function initIntelliAskDemo() {
     const API_BASE = 'https://api.bbnschool.in';
@@ -153,15 +193,15 @@ function initIntelliAskDemo() {
         progressContainer.style.display = 'none';
         resultContainer.style.display = 'block';
 
-        let html = '<div class="questions-grid">';
+        let html = '<div class="questions-list">';
 
         questions.forEach((question, index) => {
             html += '<div class="result-success">';
-            html += '<div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Question ' + (index + 1) + '</span></div>';
+            html += '<div class="result-header"><span class="result-badge"><i class="fas fa-check-circle"></i> Question ' + (index + 1) + '</span></div>';
             html += '<div class="result-question">' + escapeHtml(question) + '</div>';
             html += '<div class="share-actions">';
-            html += '<button class="action-btn" onclick="copyQuestion(' + index + ')"><i class="fas fa-copy"></i>Copy</button>';
-            html += '<button class="action-btn" onclick="shareQuestion(' + index + ')"><i class="fas fa-share-alt"></i>Share</button>';
+            html += '<button class="action-btn" onclick="copyQuestion(' + index + ')"><i class="fas fa-copy"></i> Copy</button>';
+            html += '<button class="action-btn" onclick="shareQuestion(' + index + ')"><i class="fas fa-share-alt"></i> Share</button>';
             html += '</div>';
             html += '</div>';
         });
@@ -169,10 +209,10 @@ function initIntelliAskDemo() {
         html += '</div>';
 
         if (metadata) {
-            html += '<div class="result-meta" style="margin-top: 24px; text-align: center; color: #666; font-size: 0.9rem;">';
-            html += '<span><i class="fas fa-file-alt"></i> ' + metadata.processed_pages + ' pages processed</span>';
+            html += '<div style="margin-top: 16px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 0.85rem; color: #5f6368;">';
+            html += '<i class="fas fa-info-circle"></i> Processed ' + metadata.processed_pages + ' pages';
             if (metadata.was_trimmed) {
-                html += ' <span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + metadata.original_pages + '</span>';
+                html += ' (trimmed from ' + metadata.original_pages + ')';
             }
             html += '</div>';
         }
@@ -183,7 +223,7 @@ function initIntelliAskDemo() {
         window.currentQuestions = questions;
 
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '<span>Generate More Questions</span><i class="fas fa-arrow-right"></i>';
+        generateBtn.innerHTML = '<span>Generate More</span><i class="fas fa-arrow-right"></i>';
     }
 
     function showError(msg) {
@@ -236,16 +276,17 @@ function initIntelliAskDemo() {
 window.copyQuestion = function(index) {
     const question = window.currentQuestions[index];
     navigator.clipboard.writeText(question).then(() => {
-        // Show success feedback
         const btn = event.target.closest('.action-btn');
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
-        btn.style.background = '#10b981';
-        btn.style.color = 'white';
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+        btn.style.background = '#e8f0fe';
+        btn.style.color = '#1967d2';
+        btn.style.borderColor = '#1967d2';
         setTimeout(() => {
             btn.innerHTML = originalHTML;
             btn.style.background = '';
             btn.style.color = '';
+            btn.style.borderColor = '';
         }, 2000);
     }).catch(err => {
         alert('Failed to copy: ' + err);
@@ -254,7 +295,7 @@ window.copyQuestion = function(index) {
 
 window.shareQuestion = function(index) {
     const question = window.currentQuestions[index];
-    const shareText = 'Check out this insightful question generated by IntelliAsk:\n\n' + question + '\n\nTry it yourself at: https://intelliask.github.io';
+    const shareText = 'Check out this question from IntelliAsk:\n\n' + question + '\n\nTry it: https://intelliask.github.io';
 
     if (navigator.share) {
         navigator.share({
@@ -262,17 +303,18 @@ window.shareQuestion = function(index) {
             text: shareText
         }).catch(() => {});
     } else {
-        // Fallback: copy share text
         navigator.clipboard.writeText(shareText).then(() => {
             const btn = event.target.closest('.action-btn');
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
-            btn.style.background = '#10b981';
-            btn.style.color = 'white';
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+            btn.style.background = '#e8f0fe';
+            btn.style.color = '#1967d2';
+            btn.style.borderColor = '#1967d2';
             setTimeout(() => {
                 btn.innerHTML = originalHTML;
                 btn.style.background = '';
                 btn.style.color = '';
+                btn.style.borderColor = '';
             }, 2000);
         });
     }

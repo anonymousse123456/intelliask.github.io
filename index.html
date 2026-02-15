@@ -103,17 +103,40 @@
 </section>
 
 
-<section class="hero is-light is-small" id="demo-section">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <div class="demo-container">
-        <!-- Header -->
+<!-- Table of Contents Navigation -->
+<nav class="toc-nav" id="toc-nav">
+  <div class="toc-item" data-target="demo-section">
+    <div class="toc-dot"></div>
+    <span class="toc-label">Demo</span>
+  </div>
+  <div class="toc-item" data-target="abstract">
+    <div class="toc-dot"></div>
+    <span class="toc-label">Abstract</span>
+  </div>
+  <div class="toc-item" data-target="annotation">
+    <div class="toc-dot"></div>
+    <span class="toc-label">Study</span>
+  </div>
+  <div class="toc-item" data-target="reward-model">
+    <div class="toc-dot"></div>
+    <span class="toc-label">Model</span>
+  </div>
+  <div class="toc-item" data-target="results">
+    <div class="toc-dot"></div>
+    <span class="toc-label">Results</span>
+  </div>
+</nav>
+
+<section id="demo-section">
+  <div class="demo-container">
+    <div class="demo-layout">
+      <!-- Left Side - Interactive Demo -->
+      <div class="demo-left">
         <div class="demo-header">
-          <h2 class="demo-title">Try IntelliAsk Demo</h2>
-          <p class="demo-subtitle">Upload a research paper and generate critical peer review questions</p>
+          <h2 class="demo-title">Try IntelliAsk</h2>
+          <p class="demo-subtitle">Upload a research paper PDF and generate expert-level peer review questions in seconds</p>
         </div>
 
-        <!-- Main Card -->
         <div class="demo-card">
           <!-- Upload Area -->
           <div class="upload-section">
@@ -121,43 +144,64 @@
               <input type="file" id="paper-upload" accept=".pdf">
               <div class="upload-content">
                 <div class="upload-icon">
-                  <i class="fas fa-cloud-upload-alt"></i>
+                  <i class="fas fa-file-pdf"></i>
                 </div>
                 <div class="upload-text">
-                  <span id="file-name">Drop your PDF here or click to browse</span>
-                  <span id="file-size" class="file-size">Maximum 20MB</span>
+                  <span id="file-name">Click to upload or drag and drop</span>
+                  <span id="file-size" class="file-size">PDF up to 20MB</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Generate Button -->
+          <button class="generate-btn is-light" id="generate-btn" disabled>
+            <span>Generate Questions</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
 
           <!-- Progress Container (hidden by default) -->
           <div class="progress-container" id="progress-container" style="display: none;"></div>
 
           <!-- Result Container (hidden by default) -->
           <div class="result-container" id="result-container" style="display: none;"></div>
+        </div>
+      </div>
 
-          <!-- Generate Button -->
-          <button class="generate-btn is-light" id="generate-btn" disabled>
-            <span>Generate 2 Questions</span>
-            <i class="fas fa-sparkles"></i>
-          </button>
-
-          <!-- Footer Info -->
-          <div class="demo-footer">
-            <div class="powered-by">
-              <span class="model-badge"><i class="fas fa-bolt"></i> IntelliAsk-32B</span>
-            </div>
+      <!-- Right Side - Examples & Info -->
+      <div class="demo-right">
+        <div class="example-section">
+          <h3 class="example-title">What You'll Get</h3>
+          <div class="example-item">
+            <div class="example-label">Critical Analysis</div>
+            <div class="example-text">Deep, evidence-based questions that examine methodology, assumptions, and experimental design</div>
+          </div>
+          <div class="example-item">
+            <div class="example-label">Context-Aware</div>
+            <div class="example-text">Questions grounded in the full paper content, not just the abstract or introduction</div>
+          </div>
+          <div class="example-item">
+            <div class="example-label">Expert-Level</div>
+            <div class="example-text">Trained on human reviewer preferences to match quality standards of top-tier conferences</div>
           </div>
         </div>
 
+        <div class="example-section">
+          <h3 class="example-title">Example Questions</h3>
+          <div class="example-item">
+            <div class="example-text" style="font-style: italic;">"How does the proposed architecture handle cases where the input distribution shifts during inference?"</div>
+          </div>
+          <div class="example-item">
+            <div class="example-text" style="font-style: italic;">"What evidence supports the claim that this approach generalizes beyond the tested datasets?"</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 
-<section class="section">
+<section class="section" id="abstract">
   <div class="container is-max-desktop">
     <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
@@ -199,7 +243,7 @@
   <div class="container is-max-desktop">
 
     <!-- Human Preference Annotation Study -->
-    <div class="columns is-centered">
+    <div class="columns is-centered" id="annotation">
       <div class="column is-full-width">
         <h2 class="title is-3">Human Preference Annotation Study</h2>
         <div class="content has-text-justified">
@@ -240,7 +284,7 @@
     <!--/ Human Preference Annotation Study -->
 
     <!-- IntelliReward -->
-    <div class="columns is-centered">
+    <div class="columns is-centered" id="reward-model">
       <div class="column is-full-width">
         <h2 class="title is-3">IntelliReward: Reward Model Architecture</h2>
         <div class="content has-text-justified">
@@ -312,7 +356,7 @@
     <!--/ IntelliAsk -->
 
     <!-- Evaluation Results -->
-    <div class="columns is-centered">
+    <div class="columns is-centered" id="results">
       <div class="column is-full-width">
         <h2 class="title is-3">Evaluation Results</h2>
 
