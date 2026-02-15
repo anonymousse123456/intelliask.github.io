@@ -1,78 +1,131 @@
 $(document).ready(function() {
+    // Navbar burger toggle
     $(".navbar-burger").click(function() {
-      $(".navbar-burger").toggleClass("is-active");
-      $(".navbar-menu").toggleClass("is-active");
+        var target = $(this).data("target");
+        $(this).toggleClass("is-active");
+        $("#" + target).toggleClass("is-active");
     });
 
-    var carousels = bulmaCarousel.attach('.carousel', {
-        slidesToScroll: 1,
-        slidesToShow: 3,
-        loop: true,
-        infinite: true,
-        autoplay: false
-    });
-
+    initNavigation();
+    initSidebarTOC();
     initIntelliAskDemo();
-    initTableOfContents();
 });
 
-function initTableOfContents() {
-    const toc = document.getElementById('toc-nav');
-    if (!toc) return;
-
-    const tocItems = document.querySelectorAll('.toc-item');
-
-    // Show TOC when user scrolls down
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 300) {
-            toc.classList.add('visible');
-        } else {
-            toc.classList.remove('visible');
-        }
-
-        // Highlight active section
-        tocItems.forEach(item => {
-            const target = document.getElementById(item.dataset.target);
+// ========================================
+// Top Navbar + Sidebar TOC Navigation
+// ========================================
+function initNavigation() {
+    // Navbar link clicks - smooth scroll
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('data-target');
+            var target = document.getElementById(targetId);
             if (target) {
-                const rect = target.getBoundingClientRect();
-                if (rect.top <= 100 && rect.bottom >= 100) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
+                var offset = 56 + 16; // navbar height + padding
+                var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top: top, behavior: 'smooth' });
             }
+            // Close mobile menu
+            $('.navbar-burger').removeClass('is-active');
+            $('.navbar-menu').removeClass('is-active');
         });
     });
 
-    // Smooth scroll to section on click
-    tocItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const target = document.getElementById(this.dataset.target);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Highlight active nav link on scroll
+    var navLinks = document.querySelectorAll('.nav-link');
+    var sections = [];
+    navLinks.forEach(function(link) {
+        var id = link.getAttribute('data-target');
+        var el = document.getElementById(id);
+        if (el) sections.push({ id: id, el: el });
+    });
+
+    window.addEventListener('scroll', function() {
+        var scrollPos = window.scrollY + 100;
+        var activeId = null;
+
+        for (var i = sections.length - 1; i >= 0; i--) {
+            if (sections[i].el.offsetTop <= scrollPos) {
+                activeId = sections[i].id;
+                break;
+            }
+        }
+
+        navLinks.forEach(function(link) {
+            if (link.getAttribute('data-target') === activeId) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
             }
         });
     });
 }
 
-function initIntelliAskDemo() {
-    const API_BASE = 'https://api.bbnschool.in';
+function initSidebarTOC() {
+    var tocLinks = document.querySelectorAll('.toc-link');
+    var sections = [];
 
-    const fileInput = document.getElementById('paper-upload');
-    const generateBtn = document.getElementById('generate-btn');
-    const progressContainer = document.getElementById('progress-container');
-    const resultContainer = document.getElementById('result-container');
-    const uploadArea = document.getElementById('upload-area');
+    tocLinks.forEach(function(link) {
+        var id = link.getAttribute('data-target');
+        var el = document.getElementById(id);
+        if (el) sections.push({ id: id, el: el, link: link });
+
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var targetId = this.getAttribute('data-target');
+            var target = document.getElementById(targetId);
+            if (target) {
+                var offset = 56 + 16;
+                var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Highlight active section
+    window.addEventListener('scroll', function() {
+        var scrollPos = window.scrollY + 100;
+        var activeId = null;
+
+        for (var i = sections.length - 1; i >= 0; i--) {
+            if (sections[i].el.offsetTop <= scrollPos) {
+                activeId = sections[i].id;
+                break;
+            }
+        }
+
+        tocLinks.forEach(function(link) {
+            if (link.getAttribute('data-target') === activeId) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    });
+}
+
+// ========================================
+// IntelliAsk Demo
+// ========================================
+function initIntelliAskDemo() {
+    var API_BASE = 'https://api.bbnschool.in';
+
+    var fileInput = document.getElementById('paper-upload');
+    var generateBtn = document.getElementById('generate-btn');
+    var progressContainer = document.getElementById('progress-container');
+    var resultContainer = document.getElementById('result-container');
+    var uploadArea = document.getElementById('upload-area');
 
     if (!fileInput || !generateBtn) return;
 
-    let selectedFile = null;
-    let stepStartTime = null;
-    let lastStep = -1;
-    let stepTimings = {};
-    let currentStepTimer = null;
+    var selectedFile = null;
+    var stepStartTime = null;
+    var lastStep = -1;
+    var stepTimings = {};
+    var currentStepTimer = null;
 
-    const steps = [
+    var steps = [
         { name: 'Queued', desc: 'Waiting to start...' },
         { name: 'Trimming PDF', desc: 'Processing pages...' },
         { name: 'Extracting Text', desc: 'Reading your paper...' },
@@ -80,8 +133,9 @@ function initIntelliAskDemo() {
         { name: 'Complete', desc: 'Done!' }
     ];
 
+    // File selection
     fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
+        var file = e.target.files[0];
         if (!file) return;
         if (!file.name.toLowerCase().endsWith('.pdf')) {
             alert('Please select a PDF file.');
@@ -93,20 +147,37 @@ function initIntelliAskDemo() {
         }
         selectedFile = file;
         uploadArea.classList.add('file-selected');
-        uploadArea.querySelector('.upload-icon').innerHTML = '<i class="fas fa-check-circle"></i>';
-        uploadArea.querySelector('.upload-text').innerHTML = '<span>' + file.name + '</span><span class="file-size">' + (file.size / 1024 / 1024).toFixed(2) + ' MB</span>';
+
+        var iconEl = uploadArea.querySelector('.upload-icon');
+        if (iconEl) iconEl.className = 'fas fa-check-circle upload-icon';
+
+        var nameEl = document.getElementById('file-name');
+        var sizeEl = document.getElementById('file-size');
+        if (nameEl) nameEl.textContent = file.name;
+        if (sizeEl) {
+            sizeEl.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+            sizeEl.className = 'file-meta';
+        }
+
         generateBtn.disabled = false;
         generateBtn.classList.remove('is-light');
     });
 
+    // Drag and drop
     if (uploadArea) {
-        uploadArea.addEventListener('dragover', function(e) { e.preventDefault(); uploadArea.classList.add('drag-over'); });
-        uploadArea.addEventListener('dragleave', function(e) { e.preventDefault(); uploadArea.classList.remove('drag-over'); });
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        });
         uploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
             uploadArea.classList.remove('drag-over');
             if (e.dataTransfer.files[0]) {
-                const dt = new DataTransfer();
+                var dt = new DataTransfer();
                 dt.items.add(e.dataTransfer.files[0]);
                 fileInput.files = dt.files;
                 fileInput.dispatchEvent(new Event('change'));
@@ -115,7 +186,6 @@ function initIntelliAskDemo() {
     }
 
     function renderProgress(step, elapsedSecs) {
-        // Track step changes
         if (step !== lastStep) {
             if (lastStep >= 0 && stepStartTime) {
                 stepTimings[lastStep] = Math.round((Date.now() - stepStartTime) / 1000);
@@ -124,15 +194,15 @@ function initIntelliAskDemo() {
             lastStep = step;
         }
 
-        const s = steps[step] || steps[0];
-        let html = '<div class="loading-state"><div class="step-progress">';
-        for (let i = 1; i <= 4; i++) {
-            const cls = i < step ? 'done' : (i === step ? 'active' : '');
-            let timeLabel = '';
+        var s = steps[step] || steps[0];
+        var html = '<div class="loading-state"><div class="step-progress">';
+        for (var i = 1; i <= 4; i++) {
+            var cls = i < step ? 'done' : (i === step ? 'active' : '');
+            var timeLabel = '';
             if (stepTimings[i]) {
                 timeLabel = '<span class="step-time">' + stepTimings[i] + 's</span>';
             }
-            html += '<div class="step-item ' + cls + '"><div class="step-num">' + (i < step ? '✓' : i) + '</div>' + timeLabel + '</div>';
+            html += '<div class="step-item ' + cls + '"><div class="step-num">' + (i < step ? '&#10003;' : i) + '</div>' + timeLabel + '</div>';
             if (i < 4) html += '<div class="step-line ' + (i < step ? 'done' : '') + '"></div>';
         }
         html += '</div><div class="loading-text"><strong>' + s.name + '</strong><p>' + s.desc;
@@ -147,7 +217,7 @@ function initIntelliAskDemo() {
         if (currentStepTimer) clearInterval(currentStepTimer);
         currentStepTimer = setInterval(function() {
             if (stepStartTime && lastStep > 0 && lastStep < 4) {
-                const elapsed = Math.round((Date.now() - stepStartTime) / 1000);
+                var elapsed = Math.round((Date.now() - stepStartTime) / 1000);
                 renderProgress(lastStep, elapsed);
             }
         }, 1000);
@@ -162,8 +232,8 @@ function initIntelliAskDemo() {
 
     async function pollStatus(jobId) {
         try {
-            const res = await fetch(API_BASE + '/api/status/' + jobId);
-            const data = await res.json();
+            var res = await fetch(API_BASE + '/api/status/' + jobId);
+            var data = await res.json();
 
             if (data.error && !data.status) {
                 stopElapsedTimer();
@@ -171,7 +241,7 @@ function initIntelliAskDemo() {
                 return;
             }
 
-            const elapsed = stepStartTime ? Math.round((Date.now() - stepStartTime) / 1000) : 0;
+            var elapsed = stepStartTime ? Math.round((Date.now() - stepStartTime) / 1000) : 0;
             renderProgress(data.step, elapsed);
 
             if (data.status === 'completed') {
@@ -181,7 +251,7 @@ function initIntelliAskDemo() {
                 stopElapsedTimer();
                 showError(data.error || 'Processing failed');
             } else {
-                setTimeout(() => pollStatus(jobId), 1000);
+                setTimeout(function() { pollStatus(jobId); }, 1000);
             }
         } catch (e) {
             stopElapsedTimer();
@@ -193,9 +263,8 @@ function initIntelliAskDemo() {
         progressContainer.style.display = 'none';
         resultContainer.style.display = 'block';
 
-        let html = '<div class="questions-list">';
-
-        questions.forEach((question, index) => {
+        var html = '<div class="questions-list">';
+        questions.forEach(function(question, index) {
             html += '<div class="result-success">';
             html += '<div class="result-header"><span class="result-badge"><i class="fas fa-check-circle"></i> Question ' + (index + 1) + '</span></div>';
             html += '<div class="result-question">' + escapeHtml(question) + '</div>';
@@ -205,11 +274,10 @@ function initIntelliAskDemo() {
             html += '</div>';
             html += '</div>';
         });
-
         html += '</div>';
 
         if (metadata) {
-            html += '<div style="margin-top: 16px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 0.85rem; color: #5f6368;">';
+            html += '<div style="margin-top: 12px; padding: 10px; background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 6px; font-size: 0.8rem; color: #5f6368;">';
             html += '<i class="fas fa-info-circle"></i> Processed ' + metadata.processed_pages + ' pages';
             if (metadata.was_trimmed) {
                 html += ' (trimmed from ' + metadata.original_pages + ')';
@@ -218,12 +286,10 @@ function initIntelliAskDemo() {
         }
 
         resultContainer.innerHTML = html;
-
-        // Store questions globally for copy/share functions
         window.currentQuestions = questions;
 
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '<span>Generate More</span><i class="fas fa-arrow-right"></i>';
+        generateBtn.innerHTML = '<i class="fas fa-redo"></i><span>Generate More</span>';
     }
 
     function showError(msg) {
@@ -231,9 +297,10 @@ function initIntelliAskDemo() {
         resultContainer.style.display = 'block';
         resultContainer.innerHTML = '<div class="result-error"><div class="error-icon"><i class="fas fa-exclamation-circle"></i></div><p class="error-message">' + escapeHtml(msg) + '</p></div>';
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '<span>Generate Question</span><i class="fas fa-arrow-right"></i>';
+        generateBtn.innerHTML = '<i class="fas fa-bolt"></i><span>Generate</span>';
     }
 
+    // Submit handler
     generateBtn.addEventListener('click', async function() {
         if (!selectedFile) return;
 
@@ -243,12 +310,12 @@ function initIntelliAskDemo() {
         resultContainer.style.display = 'none';
         renderProgress(0);
 
-        const formData = new FormData();
+        var formData = new FormData();
         formData.append('file', selectedFile);
 
         try {
-            const res = await fetch(API_BASE + '/api/submit', { method: 'POST', body: formData });
-            const data = await res.json();
+            var res = await fetch(API_BASE + '/api/submit', { method: 'POST', body: formData });
+            var data = await res.json();
 
             if (data.job_id) {
                 generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
@@ -266,51 +333,53 @@ function initIntelliAskDemo() {
     });
 
     function escapeHtml(text) {
-        const div = document.createElement('div');
+        var div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 }
 
-// Global functions for copy and share
+// ========================================
+// Global copy/share functions
+// ========================================
 window.copyQuestion = function(index) {
-    const question = window.currentQuestions[index];
-    navigator.clipboard.writeText(question).then(() => {
-        const btn = event.target.closest('.action-btn');
-        const originalHTML = btn.innerHTML;
+    var question = window.currentQuestions[index];
+    navigator.clipboard.writeText(question).then(function() {
+        var btn = event.target.closest('.action-btn');
+        var originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-check"></i> Copied';
         btn.style.background = '#e8f0fe';
         btn.style.color = '#1967d2';
         btn.style.borderColor = '#1967d2';
-        setTimeout(() => {
+        setTimeout(function() {
             btn.innerHTML = originalHTML;
             btn.style.background = '';
             btn.style.color = '';
             btn.style.borderColor = '';
         }, 2000);
-    }).catch(err => {
+    }).catch(function(err) {
         alert('Failed to copy: ' + err);
     });
 };
 
 window.shareQuestion = function(index) {
-    const question = window.currentQuestions[index];
-    const shareText = 'Check out this question from IntelliAsk:\n\n' + question + '\n\nTry it: https://intelliask.github.io';
+    var question = window.currentQuestions[index];
+    var shareText = 'Check out this question from IntelliAsk:\n\n' + question + '\n\nTry it: https://intelliask.github.io';
 
     if (navigator.share) {
         navigator.share({
             title: 'IntelliAsk Question',
             text: shareText
-        }).catch(() => {});
+        }).catch(function() {});
     } else {
-        navigator.clipboard.writeText(shareText).then(() => {
-            const btn = event.target.closest('.action-btn');
-            const originalHTML = btn.innerHTML;
+        navigator.clipboard.writeText(shareText).then(function() {
+            var btn = event.target.closest('.action-btn');
+            var originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Copied';
             btn.style.background = '#e8f0fe';
             btn.style.color = '#1967d2';
             btn.style.borderColor = '#1967d2';
-            setTimeout(() => {
+            setTimeout(function() {
                 btn.innerHTML = originalHTML;
                 btn.style.background = '';
                 btn.style.color = '';
