@@ -27,6 +27,10 @@ function initIntelliAskDemo() {
     if (!fileInput || !generateBtn) return;
 
     let selectedFile = null;
+    let stepStartTime = null;
+    let lastStep = -1;
+    let stepTimings = {};
+    let currentStepTimer = null;
 
     const steps = [
         { name: 'Queued', desc: 'Waiting to start...' },
@@ -70,16 +74,50 @@ function initIntelliAskDemo() {
         });
     }
 
-    function renderProgress(step) {
+    function renderProgress(step, elapsedSecs) {
+        // Track step changes
+        if (step !== lastStep) {
+            if (lastStep >= 0 && stepStartTime) {
+                stepTimings[lastStep] = Math.round((Date.now() - stepStartTime) / 1000);
+            }
+            stepStartTime = Date.now();
+            lastStep = step;
+        }
+
         const s = steps[step] || steps[0];
         let html = '<div class="loading-state"><div class="step-progress">';
         for (let i = 1; i <= 4; i++) {
             const cls = i < step ? 'done' : (i === step ? 'active' : '');
-            html += '<div class="step-item ' + cls + '"><div class="step-num">' + (i < step ? '✓' : i) + '</div></div>';
+            let timeLabel = '';
+            if (stepTimings[i]) {
+                timeLabel = '<span class="step-time">' + stepTimings[i] + 's</span>';
+            }
+            html += '<div class="step-item ' + cls + '"><div class="step-num">' + (i < step ? '✓' : i) + '</div>' + timeLabel + '</div>';
             if (i < 4) html += '<div class="step-line ' + (i < step ? 'done' : '') + '"></div>';
         }
-        html += '</div><div class="loading-text"><strong>' + s.name + '</strong><p>' + s.desc + '</p></div></div>';
+        html += '</div><div class="loading-text"><strong>' + s.name + '</strong><p>' + s.desc;
+        if (step > 0 && step < 4 && elapsedSecs !== undefined) {
+            html += ' <span class="elapsed-time">(' + elapsedSecs + 's)</span>';
+        }
+        html += '</p></div></div>';
         progressContainer.innerHTML = html;
+    }
+
+    function startElapsedTimer() {
+        if (currentStepTimer) clearInterval(currentStepTimer);
+        currentStepTimer = setInterval(function() {
+            if (stepStartTime && lastStep > 0 && lastStep < 4) {
+                const elapsed = Math.round((Date.now() - stepStartTime) / 1000);
+                renderProgress(lastStep, elapsed);
+            }
+        }, 1000);
+    }
+
+    function stopElapsedTimer() {
+        if (currentStepTimer) {
+            clearInterval(currentStepTimer);
+            currentStepTimer = null;
+        }
     }
 
     async function pollStatus(jobId) {
@@ -88,36 +126,64 @@ function initIntelliAskDemo() {
             const data = await res.json();
 
             if (data.error && !data.status) {
+                stopElapsedTimer();
                 showError(data.error);
                 return;
             }
 
-            renderProgress(data.step);
+            const elapsed = stepStartTime ? Math.round((Date.now() - stepStartTime) / 1000) : 0;
+            renderProgress(data.step, elapsed);
 
             if (data.status === 'completed') {
-                showResult(data.question, data.metadata);
+                stopElapsedTimer();
+                showResult(data.questions, data.metadata);
             } else if (data.status === 'error') {
+                stopElapsedTimer();
                 showError(data.error || 'Processing failed');
             } else {
                 setTimeout(() => pollStatus(jobId), 1000);
             }
         } catch (e) {
+            stopElapsedTimer();
             showError('Connection error. Please try again.');
         }
     }
 
-    function showResult(question, metadata) {
+    function showResult(questions, metadata) {
         progressContainer.style.display = 'none';
         resultContainer.style.display = 'block';
-        let meta = '';
+
+        let html = '<div class="questions-grid">';
+
+        questions.forEach((question, index) => {
+            html += '<div class="result-success">';
+            html += '<div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Question ' + (index + 1) + '</span></div>';
+            html += '<div class="result-question">' + escapeHtml(question) + '</div>';
+            html += '<div class="share-actions">';
+            html += '<button class="action-btn" onclick="copyQuestion(' + index + ')"><i class="fas fa-copy"></i>Copy</button>';
+            html += '<button class="action-btn" onclick="shareQuestion(' + index + ')"><i class="fas fa-share-alt"></i>Share</button>';
+            html += '</div>';
+            html += '</div>';
+        });
+
+        html += '</div>';
+
         if (metadata) {
-            meta = '<div class="result-meta"><span><i class="fas fa-file-alt"></i> ' + metadata.processed_pages + ' pages</span>';
-            if (metadata.was_trimmed) meta += '<span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + metadata.original_pages + '</span>';
-            meta += '</div>';
+            html += '<div class="result-meta" style="margin-top: 24px; text-align: center; color: #666; font-size: 0.9rem;">';
+            html += '<span><i class="fas fa-file-alt"></i> ' + metadata.processed_pages + ' pages processed</span>';
+            if (metadata.was_trimmed) {
+                html += ' <span class="trimmed-badge"><i class="fas fa-cut"></i> Trimmed from ' + metadata.original_pages + '</span>';
+            }
+            html += '</div>';
         }
-        resultContainer.innerHTML = '<div class="result-success"><div class="result-header"><span class="result-badge"><i class="fas fa-lightbulb"></i> Generated Question</span></div><div class="result-question">' + escapeHtml(question) + '</div>' + meta + '</div>';
+
+        resultContainer.innerHTML = html;
+
+        // Store questions globally for copy/share functions
+        window.currentQuestions = questions;
+
         generateBtn.disabled = false;
-        generateBtn.innerHTML = '<span>Generate Another</span><i class="fas fa-arrow-right"></i>';
+        generateBtn.innerHTML = '<span>Generate More Questions</span><i class="fas fa-arrow-right"></i>';
     }
 
     function showError(msg) {
@@ -146,6 +212,10 @@ function initIntelliAskDemo() {
 
             if (data.job_id) {
                 generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
+                stepStartTime = Date.now();
+                lastStep = 0;
+                stepTimings = {};
+                startElapsedTimer();
                 pollStatus(data.job_id);
             } else {
                 showError('Failed to submit job');
@@ -161,3 +231,49 @@ function initIntelliAskDemo() {
         return div.innerHTML;
     }
 }
+
+// Global functions for copy and share
+window.copyQuestion = function(index) {
+    const question = window.currentQuestions[index];
+    navigator.clipboard.writeText(question).then(() => {
+        // Show success feedback
+        const btn = event.target.closest('.action-btn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
+        btn.style.background = '#10b981';
+        btn.style.color = 'white';
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+            btn.style.color = '';
+        }, 2000);
+    }).catch(err => {
+        alert('Failed to copy: ' + err);
+    });
+};
+
+window.shareQuestion = function(index) {
+    const question = window.currentQuestions[index];
+    const shareText = 'Check out this insightful question generated by IntelliAsk:\n\n' + question + '\n\nTry it yourself at: https://intelliask.github.io';
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'IntelliAsk Question',
+            text: shareText
+        }).catch(() => {});
+    } else {
+        // Fallback: copy share text
+        navigator.clipboard.writeText(shareText).then(() => {
+            const btn = event.target.closest('.action-btn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
+            btn.style.background = '#10b981';
+            btn.style.color = 'white';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 2000);
+        });
+    }
+};
