@@ -126,7 +126,7 @@ function initIntelliAskDemo() {
     var currentStepTimer = null;
 
     var steps = [
-        { name: 'Queued', desc: 'Waiting to start...' },
+        { name: 'Uploading', desc: 'Sending your paper...' },
         { name: 'Trimming PDF', desc: 'Processing pages...' },
         { name: 'Extracting Text', desc: 'Reading your paper...' },
         { name: 'Generating Question', desc: 'IntelliAsk is thinking...' },
@@ -185,6 +185,8 @@ function initIntelliAskDemo() {
         });
     }
 
+    var uploadPercent = 0;
+
     function renderProgress(step, elapsedSecs) {
         if (step !== lastStep) {
             if (lastStep >= 0 && stepStartTime) {
@@ -206,10 +208,17 @@ function initIntelliAskDemo() {
             if (i < 4) html += '<div class="step-line ' + (i < step ? 'done' : '') + '"></div>';
         }
         html += '</div><div class="loading-text"><strong>' + s.name + '</strong><p>' + s.desc;
-        if (step > 0 && step < 4 && elapsedSecs !== undefined) {
+        if (step === 0 && uploadPercent > 0) {
+            html += ' <span class="elapsed-time">' + uploadPercent + '%</span>';
+        } else if (step > 0 && step < 4 && elapsedSecs !== undefined) {
             html += ' <span class="elapsed-time">(' + elapsedSecs + 's)</span>';
         }
-        html += '</p></div></div>';
+        html += '</p></div>';
+        // Upload progress bar for step 0
+        if (step === 0) {
+            html += '<div class="upload-progress-bar"><div class="upload-progress-fill" style="width:' + uploadPercent + '%"></div></div>';
+        }
+        html += '</div>';
         progressContainer.innerHTML = html;
     }
 
@@ -300,36 +309,68 @@ function initIntelliAskDemo() {
         generateBtn.innerHTML = '<i class="fas fa-bolt"></i><span>Generate</span>';
     }
 
-    // Submit handler
-    generateBtn.addEventListener('click', async function() {
+    // Submit handler - uses XMLHttpRequest for upload progress
+    generateBtn.addEventListener('click', function() {
         if (!selectedFile) return;
 
         generateBtn.disabled = true;
-        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Submitting...</span>';
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Uploading...</span>';
         progressContainer.style.display = 'block';
         resultContainer.style.display = 'none';
+        uploadPercent = 0;
+        stepStartTime = Date.now();
+        lastStep = -1;
+        stepTimings = {};
         renderProgress(0);
 
         var formData = new FormData();
         formData.append('file', selectedFile);
 
-        try {
-            var res = await fetch(API_BASE + '/api/submit', { method: 'POST', body: formData });
-            var data = await res.json();
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', API_BASE + '/api/submit', true);
 
-            if (data.job_id) {
-                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
-                stepStartTime = Date.now();
-                lastStep = 0;
-                stepTimings = {};
-                startElapsedTimer();
-                pollStatus(data.job_id);
-            } else {
-                showError('Failed to submit job');
+        // Track upload progress
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                uploadPercent = Math.round((e.loaded / e.total) * 100);
+                renderProgress(0);
+                generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Uploading ' + uploadPercent + '%</span>';
             }
-        } catch (e) {
-            showError('Connection error');
-        }
+        });
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.job_id) {
+                        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Processing...</span>';
+                        uploadPercent = 100;
+                        stepTimings[0] = Math.round((Date.now() - stepStartTime) / 1000);
+                        stepStartTime = Date.now();
+                        lastStep = 0;
+                        startElapsedTimer();
+                        pollStatus(data.job_id);
+                    } else {
+                        showError('Failed to submit job');
+                    }
+                } catch (e) {
+                    showError('Invalid response from server');
+                }
+            } else {
+                showError('Server error (' + xhr.status + ')');
+            }
+        };
+
+        xhr.onerror = function() {
+            showError('Connection error. Check your internet and try again.');
+        };
+
+        xhr.ontimeout = function() {
+            showError('Upload timed out. Try a smaller file or check your connection.');
+        };
+
+        xhr.timeout = 300000; // 5 minute timeout for upload
+        xhr.send(formData);
     });
 
     function escapeHtml(text) {
