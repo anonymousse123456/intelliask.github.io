@@ -9,7 +9,47 @@ $(document).ready(function() {
     initNavigation();
     initSidebarTOC();
     initIntelliAskDemo();
+    initExampleTypewriter();
 });
+
+// ========================================
+// Typewriter Effect
+// ========================================
+function typewriterEffect(element, text, speed, callback) {
+    element.textContent = '';
+    element.classList.add('typewriter-cursor');
+    var i = 0;
+    function type() {
+        if (i < text.length) {
+            // Add multiple characters per tick for longer texts
+            var charsPerTick = text.length > 200 ? 3 : 1;
+            element.textContent += text.substring(i, i + charsPerTick);
+            i += charsPerTick;
+            setTimeout(type, speed);
+        } else {
+            element.classList.remove('typewriter-cursor');
+            if (callback) callback();
+        }
+    }
+    type();
+}
+
+function initExampleTypewriter() {
+    var el = document.getElementById('example-question-text');
+    if (!el) return;
+
+    var fullText = el.textContent.trim();
+    // Start typewriter when element is visible
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                observer.disconnect();
+                typewriterEffect(el, fullText, 15);
+            }
+        });
+    }, { threshold: 0.3 });
+    observer.observe(el);
+}
 
 // ========================================
 // Top Navbar + Sidebar TOC Navigation
@@ -116,6 +156,7 @@ function initIntelliAskDemo() {
     var progressContainer = document.getElementById('progress-container');
     var resultContainer = document.getElementById('result-container');
     var uploadArea = document.getElementById('upload-area');
+    var exampleOutput = document.getElementById('example-output');
 
     if (!fileInput || !generateBtn) return;
 
@@ -269,6 +310,9 @@ function initIntelliAskDemo() {
     }
 
     function showResult(questions, metadata) {
+        // Hide example output when showing real results
+        if (exampleOutput) exampleOutput.style.display = 'none';
+
         progressContainer.style.display = 'none';
         resultContainer.style.display = 'block';
 
@@ -276,7 +320,7 @@ function initIntelliAskDemo() {
         questions.forEach(function(question, index) {
             html += '<div class="result-success">';
             html += '<div class="result-header"><span class="result-badge"><i class="fas fa-check-circle"></i> Question ' + (index + 1) + '</span></div>';
-            html += '<div class="result-question">' + escapeHtml(question) + '</div>';
+            html += '<div class="result-question" id="result-q-' + index + '"></div>';
             html += '<div class="share-actions">';
             html += '<button class="action-btn" onclick="copyQuestion(' + index + ')"><i class="fas fa-copy"></i> Copy</button>';
             html += '<button class="action-btn" onclick="shareQuestion(' + index + ')"><i class="fas fa-share-alt"></i> Share</button>';
@@ -297,6 +341,16 @@ function initIntelliAskDemo() {
         resultContainer.innerHTML = html;
         window.currentQuestions = questions;
 
+        // Typewriter effect for each question
+        questions.forEach(function(question, index) {
+            var el = document.getElementById('result-q-' + index);
+            if (el) {
+                setTimeout(function() {
+                    typewriterEffect(el, question, 12);
+                }, index * 300);
+            }
+        });
+
         generateBtn.disabled = false;
         generateBtn.innerHTML = '<i class="fas fa-redo"></i><span>Generate More</span>';
     }
@@ -312,6 +366,9 @@ function initIntelliAskDemo() {
     // Submit handler - uses XMLHttpRequest for upload progress
     generateBtn.addEventListener('click', function() {
         if (!selectedFile) return;
+
+        // Hide example output during processing
+        if (exampleOutput) exampleOutput.style.display = 'none';
 
         generateBtn.disabled = true;
         generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Uploading...</span>';

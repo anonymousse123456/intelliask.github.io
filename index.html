@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="Preference Optimization for Review Question Generation Improves Writing Quality. Training LLMs to ask better peer review questions through human-aligned reward models improves reasoning and writing capabilities.">
-  <meta name="keywords" content="IntelliAsk, IntelliReward, Peer Review, Question Generation, Reward Models, Reinforcement Learning, DAPO, LLM, ACL 2026">
+        content="IntelliAsk - Get expert peer review questions for any research paper in seconds. Trained on 15,500+ ICLR review questions. Outperforms GPT-5 and Gemini 2.5 Pro.">
+  <meta name="keywords" content="IntelliAsk, peer review, question generation, AI reviewer, research paper, ICLR, ACL 2026">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IntelliAsk - Preference Optimization for Review Question Generation</title>
+  <title>IntelliAsk - Expert Peer Review Questions in Seconds</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&family=Castoro&display=swap"
         rel="stylesheet">
@@ -17,14 +17,14 @@
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  <link rel="stylesheet" href="./static/css/index.css?v=11">
+  <link rel="stylesheet" href="./static/css/index.css?v=12">
   <link rel="icon" href="./static/images/favicon.svg">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
   <script src="./static/js/bulma-carousel.min.js"></script>
   <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js?v=11"></script>
+  <script src="./static/js/index.js?v=12"></script>
 </head>
 <body>
 
@@ -57,18 +57,69 @@
   </div>
 </nav>
 
-<!-- Compact Hero -->
-<section class="hero-compact" id="hero">
-  <div class="hero-inner">
-    <h1 class="hero-title">Preference Optimization for Review Question Generation Improves Writing Quality</h1>
-    <p class="hero-authors">Anonymous Authors</p>
-    <div class="hero-links">
-      <a href="#" class="hero-btn">
-        <i class="fas fa-file-pdf"></i> Paper (Coming Soon)
-      </a>
-      <a href="https://anonymous.4open.science/r/IntelliA-3E09/" class="hero-btn" target="_blank">
-        <i class="fab fa-github"></i> Code
-      </a>
+<!-- ========================================
+     HERO = DEMO (the first thing anyone sees)
+     ======================================== -->
+<section class="hero-demo" id="demo-section">
+  <div class="hero-demo-inner">
+    <h1 class="hero-headline">Get expert peer review questions in seconds</h1>
+    <p class="hero-subline">Drop any research paper. Our AI reads it and asks what a top reviewer would.</p>
+
+    <!-- Demo Card -->
+    <div class="demo-card">
+      <div class="demo-inner">
+        <div class="upload-row">
+          <div class="upload-area" id="upload-area">
+            <input type="file" id="paper-upload" accept=".pdf">
+            <div class="upload-content">
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <div class="upload-text">
+                <span id="file-name">Drop PDF here or click to upload</span>
+                <span id="file-size" class="file-meta">Max 20MB</span>
+              </div>
+            </div>
+          </div>
+          <button class="generate-btn is-light" id="generate-btn" disabled>
+            <i class="fas fa-bolt"></i>
+            <span>Generate</span>
+          </button>
+        </div>
+
+        <!-- Progress Container (hidden by default) -->
+        <div class="progress-container" id="progress-container" style="display: none;"></div>
+
+        <!-- Result Container (hidden by default) -->
+        <div class="result-container" id="result-container" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Stats Bar (social proof) -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-number" data-target="15500">15,500+</span>
+        <span class="stat-label">ICLR review questions trained on</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number stat-highlight">Beats GPT-5</span>
+        <span class="stat-label">& Gemini 2.5 Pro on review quality</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">21%</span>
+        <span class="stat-label">first-page bias (lowest of all models)</span>
+      </div>
+    </div>
+
+    <!-- Example Output (instant gratification) -->
+    <div class="example-output" id="example-output">
+      <div class="example-badge"><i class="fas fa-magic"></i> Example output</div>
+      <div class="example-paper">
+        <span class="example-paper-label">Paper:</span> Attention Is All You Need (Vaswani et al.)
+      </div>
+      <div class="example-question" id="example-question-text">
+        The paper claims that self-attention layers are faster than recurrent layers when the sequence length n is smaller than the representation dimensionality d. Given that modern applications increasingly involve very long sequences (e.g., document-level translation, genomic sequences), how does the O(n^2 * d) complexity of self-attention practically affect scalability, and have the authors considered or benchmarked hybrid architectures that combine local attention windows with sparse global attention patterns to maintain the parallelization benefits while reducing this quadratic bottleneck?
+      </div>
     </div>
   </div>
 </section>
@@ -82,6 +133,10 @@
       <a class="toc-link active" data-target="demo-section">
         <span class="toc-indicator"></span>
         <span class="toc-text">Demo</span>
+      </a>
+      <a class="toc-link" data-target="paper-info">
+        <span class="toc-indicator"></span>
+        <span class="toc-text">Paper</span>
       </a>
       <a class="toc-link" data-target="abstract">
         <span class="toc-indicator"></span>
@@ -113,6 +168,22 @@
   <!-- Main Content -->
   <main class="main-content">
 
+    <!-- Paper Info (moved from hero) -->
+    <section class="content-section paper-info-section" id="paper-info">
+      <div class="paper-info-card">
+        <h2 class="paper-info-title">Preference Optimization for Review Question Generation Improves Writing Quality</h2>
+        <p class="paper-info-authors">Anonymous Authors</p>
+        <div class="paper-info-links">
+          <a href="#" class="hero-btn">
+            <i class="fas fa-file-pdf"></i> Paper (Coming Soon)
+          </a>
+          <a href="https://anonymous.4open.science/r/IntelliA-3E09/" class="hero-btn" target="_blank">
+            <i class="fab fa-github"></i> Code
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Architecture Teaser (compact) -->
     <section class="content-section teaser-section">
       <img src="./static/images/intelliask/architecture.png"
@@ -122,42 +193,6 @@
         <strong>IntelliAsk</strong> learns to generate critical, evidence-based peer review questions through
         reinforcement learning with human preferences.
       </p>
-    </section>
-
-    <!-- Demo Section - Compact, Centered -->
-    <section class="content-section" id="demo-section">
-      <div class="section-header">
-        <h2 class="section-title">Try IntelliAsk</h2>
-        <p class="section-desc">Upload a research paper and get expert-level peer review questions in seconds.</p>
-      </div>
-
-      <div class="demo-card">
-        <div class="demo-inner">
-          <!-- Upload + Button in a horizontal row -->
-          <div class="upload-row">
-            <div class="upload-area" id="upload-area">
-              <input type="file" id="paper-upload" accept=".pdf">
-              <div class="upload-content">
-                <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                <div class="upload-text">
-                  <span id="file-name">Drop PDF here or click to upload</span>
-                  <span id="file-size" class="file-meta">Max 20MB</span>
-                </div>
-              </div>
-            </div>
-            <button class="generate-btn is-light" id="generate-btn" disabled>
-              <i class="fas fa-bolt"></i>
-              <span>Generate</span>
-            </button>
-          </div>
-
-          <!-- Progress Container (hidden by default) -->
-          <div class="progress-container" id="progress-container" style="display: none;"></div>
-
-          <!-- Result Container (hidden by default) -->
-          <div class="result-container" id="result-container" style="display: none;"></div>
-        </div>
-      </div>
     </section>
 
     <!-- Abstract -->
