@@ -280,8 +280,6 @@ function initIntelliAskDemo() {
         }
     }
 
-    var streamingShown = false;
-
     async function pollStatus(jobId) {
         try {
             var res = await fetch(API_BASE + '/api/status/' + jobId);
@@ -296,11 +294,6 @@ function initIntelliAskDemo() {
             var elapsed = stepStartTime ? Math.round((Date.now() - stepStartTime) / 1000) : 0;
             renderProgress(data.step, elapsed);
 
-            // Show partial text as it streams in during generation
-            if (data.step === 3 && data.partial_text) {
-                showPartialResult(data.partial_text);
-            }
-
             if (data.status === 'completed') {
                 stopElapsedTimer();
                 showResult(data.questions, data.metadata);
@@ -308,9 +301,7 @@ function initIntelliAskDemo() {
                 stopElapsedTimer();
                 showError(data.error || 'Processing failed');
             } else {
-                // Poll faster during generation to show tokens sooner
-                var interval = data.step === 3 ? 500 : 1000;
-                setTimeout(function() { pollStatus(jobId); }, interval);
+                setTimeout(function() { pollStatus(jobId); }, 1000);
             }
         } catch (e) {
             stopElapsedTimer();
@@ -318,28 +309,7 @@ function initIntelliAskDemo() {
         }
     }
 
-    function showPartialResult(partialText) {
-        if (!partialText) return;
-        if (exampleOutput) exampleOutput.style.display = 'none';
-
-        // Show result container with streaming text
-        if (!streamingShown) {
-            streamingShown = true;
-            progressContainer.style.display = 'none';
-            resultContainer.style.display = 'block';
-            resultContainer.innerHTML =
-                '<div class="questions-list"><div class="result-success">' +
-                '<div class="result-header"><span class="result-badge"><i class="fas fa-bolt"></i> Generating...</span></div>' +
-                '<div class="result-question typewriter-cursor" id="stream-q"></div>' +
-                '</div></div>';
-        }
-
-        var el = document.getElementById('stream-q');
-        if (el) el.textContent = partialText;
-    }
-
     function showResult(questions, metadata) {
-        streamingShown = false;
         if (exampleOutput) exampleOutput.style.display = 'none';
 
         progressContainer.style.display = 'none';
@@ -406,7 +376,6 @@ function initIntelliAskDemo() {
         stepStartTime = Date.now();
         lastStep = -1;
         stepTimings = {};
-        streamingShown = false;
         renderProgress(0);
 
         var formData = new FormData();
