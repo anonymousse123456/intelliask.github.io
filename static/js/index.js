@@ -280,6 +280,8 @@ function initIntelliAskDemo() {
         }
     }
 
+    var streamingShown = false;
+
     async function pollStatus(jobId) {
         try {
             var res = await fetch(API_BASE + '/api/status/' + jobId);
@@ -294,6 +296,11 @@ function initIntelliAskDemo() {
             var elapsed = stepStartTime ? Math.round((Date.now() - stepStartTime) / 1000) : 0;
             renderProgress(data.step, elapsed);
 
+            // Show partial text as it streams in during generation
+            if (data.step === 3 && data.partial_text) {
+                showPartialResult(data.partial_text);
+            }
+
             if (data.status === 'completed') {
                 stopElapsedTimer();
                 showResult(data.questions, data.metadata);
@@ -301,7 +308,9 @@ function initIntelliAskDemo() {
                 stopElapsedTimer();
                 showError(data.error || 'Processing failed');
             } else {
-                setTimeout(function() { pollStatus(jobId); }, 1000);
+                // Poll faster during generation to show tokens sooner
+                var interval = data.step === 3 ? 500 : 1000;
+                setTimeout(function() { pollStatus(jobId); }, interval);
             }
         } catch (e) {
             stopElapsedTimer();
@@ -309,8 +318,28 @@ function initIntelliAskDemo() {
         }
     }
 
+    function showPartialResult(partialText) {
+        if (!partialText) return;
+        if (exampleOutput) exampleOutput.style.display = 'none';
+
+        // Show result container with streaming text
+        if (!streamingShown) {
+            streamingShown = true;
+            progressContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            resultContainer.innerHTML =
+                '<div class="questions-list"><div class="result-success">' +
+                '<div class="result-header"><span class="result-badge"><i class="fas fa-bolt"></i> Generating...</span></div>' +
+                '<div class="result-question typewriter-cursor" id="stream-q"></div>' +
+                '</div></div>';
+        }
+
+        var el = document.getElementById('stream-q');
+        if (el) el.textContent = partialText;
+    }
+
     function showResult(questions, metadata) {
-        // Hide example output when showing real results
+        streamingShown = false;
         if (exampleOutput) exampleOutput.style.display = 'none';
 
         progressContainer.style.display = 'none';
@@ -322,8 +351,8 @@ function initIntelliAskDemo() {
             html += '<div class="result-header"><span class="result-badge"><i class="fas fa-check-circle"></i> Question ' + (index + 1) + '</span></div>';
             html += '<div class="result-question" id="result-q-' + index + '"></div>';
             html += '<div class="share-actions">';
-            html += '<button class="action-btn" onclick="copyQuestion(' + index + ')"><i class="fas fa-copy"></i> Copy</button>';
-            html += '<button class="action-btn" onclick="shareQuestion(' + index + ')"><i class="fas fa-share-alt"></i> Share</button>';
+            html += '<button class="action-btn" onclick="copyQuestion(' + index + ',event)"><i class="fas fa-copy"></i> Copy</button>';
+            html += '<button class="action-btn" onclick="shareQuestion(' + index + ',event)"><i class="fas fa-share-alt"></i> Share</button>';
             html += '</div>';
             html += '</div>';
         });
@@ -341,7 +370,6 @@ function initIntelliAskDemo() {
         resultContainer.innerHTML = html;
         window.currentQuestions = questions;
 
-        // Typewriter effect for each question
         questions.forEach(function(question, index) {
             var el = document.getElementById('result-q-' + index);
             if (el) {
@@ -378,6 +406,7 @@ function initIntelliAskDemo() {
         stepStartTime = Date.now();
         lastStep = -1;
         stepTimings = {};
+        streamingShown = false;
         renderProgress(0);
 
         var formData = new FormData();
@@ -440,10 +469,10 @@ function initIntelliAskDemo() {
 // ========================================
 // Global copy/share functions
 // ========================================
-window.copyQuestion = function(index) {
+window.copyQuestion = function(index, e) {
     var question = window.currentQuestions[index];
+    var btn = e.target.closest('.action-btn');
     navigator.clipboard.writeText(question).then(function() {
-        var btn = event.target.closest('.action-btn');
         var originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-check"></i> Copied';
         btn.style.background = '#e8f0fe';
@@ -460,7 +489,7 @@ window.copyQuestion = function(index) {
     });
 };
 
-window.shareQuestion = function(index) {
+window.shareQuestion = function(index, e) {
     var question = window.currentQuestions[index];
     var shareText = 'Check out this question from IntelliAsk:\n\n' + question + '\n\nTry it: https://intelliask.github.io';
 
@@ -470,8 +499,8 @@ window.shareQuestion = function(index) {
             text: shareText
         }).catch(function() {});
     } else {
+        var btn = e.target.closest('.action-btn');
         navigator.clipboard.writeText(shareText).then(function() {
-            var btn = event.target.closest('.action-btn');
             var originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i> Copied';
             btn.style.background = '#e8f0fe';
