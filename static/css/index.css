@@ -321,80 +321,38 @@ body {
    ======================================== */
 /* Resource Buttons */
 .resource-buttons {
-  margin-top: 28px;
+  margin-top: 24px;
   display: flex;
-  gap: 16px;
+  gap: 10px;
   justify-content: center;
-  flex-wrap: wrap;
 }
 
 .resource-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 24px;
-  border-radius: 14px;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   text-decoration: none;
-  color: #fff;
   font-family: 'Google Sans', 'Noto Sans', sans-serif;
-  min-width: 260px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  position: relative;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .resource-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-  color: #fff;
+  background: #fff9e6;
+  border-color: #ffcc00;
+  box-shadow: 0 2px 8px rgba(255,166,0,0.12);
+  color: #1a1a1a;
 }
 
-.resource-btn > i:first-child {
-  font-size: 1.4rem;
-  opacity: 0.9;
-}
-
-.resource-btn-text {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.resource-btn-title {
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
-}
-
-.resource-btn-sub {
-  font-size: 0.75rem;
-  opacity: 0.8;
-  margin-top: 2px;
-}
-
-.resource-btn-arrow {
-  font-size: 0.85rem;
-  opacity: 0.6;
-  transition: transform 0.2s, opacity 0.2s;
-}
-
-.resource-btn:hover .resource-btn-arrow {
-  transform: translateX(3px);
-  opacity: 1;
-}
-
-.resource-btn--dataset {
-  background: linear-gradient(135deg, #1a73e8, #4285f4);
-  box-shadow: 0 4px 14px rgba(26,115,232,0.3);
-}
-
-.resource-btn--preference {
-  background: linear-gradient(135deg, #0d652d, #1e8e3e);
-  box-shadow: 0 4px 14px rgba(30,142,62,0.3);
-}
-
-.resource-btn--model {
-  background: linear-gradient(135deg, #7b1fa2, #9c27b0);
-  box-shadow: 0 4px 14px rgba(156,39,176,0.3);
+.hf-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 /* ========================================
@@ -1065,12 +1023,7 @@ body {
   }
 
   .resource-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .resource-btn {
-    min-width: unset;
+    flex-wrap: wrap;
   }
 
   .main-content {
