@@ -319,61 +319,82 @@ body {
 /* ========================================
    Example Output (instant gratification)
    ======================================== */
-.example-output {
-  margin-top: 24px;
-  background: #fff;
-  border: 1px solid #e8eaed;
-  border-radius: 12px;
-  padding: 20px 24px;
-  text-align: left;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(60,64,67,0.08);
+/* Resource Buttons */
+.resource-buttons {
+  margin-top: 28px;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.example-badge {
-  display: inline-flex;
+.resource-btn {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  background: #fef7e0;
-  color: #b06000;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.7rem;
+  gap: 14px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #fff;
+  font-family: 'Google Sans', 'Noto Sans', sans-serif;
+  min-width: 260px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.resource-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  color: #fff;
+}
+
+.resource-btn > i:first-child {
+  font-size: 1.4rem;
+  opacity: 0.9;
+}
+
+.resource-btn-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.resource-btn-title {
   font-weight: 600;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
 }
 
-.example-paper {
-  font-size: 0.8rem;
-  color: #5f6368;
-  margin-bottom: 10px;
+.resource-btn-sub {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 2px;
 }
 
-.example-paper-label {
-  font-weight: 600;
-  color: #3c4043;
+.resource-btn-arrow {
+  font-size: 0.85rem;
+  opacity: 0.6;
+  transition: transform 0.2s, opacity 0.2s;
 }
 
-.example-question {
-  font-size: 0.9rem;
-  line-height: 1.65;
-  color: #202124;
-  font-style: italic;
+.resource-btn:hover .resource-btn-arrow {
+  transform: translateX(3px);
+  opacity: 1;
 }
 
-/* Typewriter cursor for example (on load animation) */
-.typewriter-cursor::after {
-  content: '|';
-  color: #1a73e8;
-  font-weight: 300;
-  animation: blink 0.8s infinite;
+.resource-btn--dataset {
+  background: linear-gradient(135deg, #1a73e8, #4285f4);
+  box-shadow: 0 4px 14px rgba(26,115,232,0.3);
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+.resource-btn--preference {
+  background: linear-gradient(135deg, #0d652d, #1e8e3e);
+  box-shadow: 0 4px 14px rgba(30,142,62,0.3);
+}
+
+.resource-btn--model {
+  background: linear-gradient(135deg, #7b1fa2, #9c27b0);
+  box-shadow: 0 4px 14px rgba(156,39,176,0.3);
 }
 
 /* ========================================
@@ -1043,8 +1064,13 @@ body {
     height: 1px;
   }
 
-  .example-output {
-    padding: 16px;
+  .resource-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resource-btn {
+    min-width: unset;
   }
 
   .main-content {
