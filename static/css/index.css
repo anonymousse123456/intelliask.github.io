@@ -733,6 +733,15 @@ body {
   margin: 0 0 16px;
 }
 
+.paper-info-authors a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.paper-info-authors a:hover {
+  text-decoration: underline;
+}
+
 .paper-info-links {
   display: flex;
   gap: 12px;
