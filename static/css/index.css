@@ -740,6 +740,17 @@ body {
   flex-wrap: wrap;
 }
 
+.arxiv-note {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: #d93025;
+  line-height: 1.5;
+}
+
+.arxiv-note i {
+  margin-right: 4px;
+}
+
 .hero-btn {
   display: inline-flex;
   align-items: center;
