@@ -145,6 +145,23 @@ body {
   max-width: 100%;
 }
 
+.demo-powered-by {
+  margin-top: 12px;
+  font-size: 0.72rem;
+  color: #9aa0a6;
+  text-align: center;
+}
+
+.demo-powered-by a {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.demo-powered-by a:hover {
+  text-decoration: underline;
+}
+
 /* Upload Row */
 .upload-row {
   display: flex;
