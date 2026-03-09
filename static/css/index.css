@@ -99,8 +99,8 @@ body {
 
 .hero-paper-title {
   font-family: 'Google Sans', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 600;
   color: #1a73e8;
   margin: 0 0 12px;
   letter-spacing: 0.01em;
@@ -108,7 +108,7 @@ body {
 
 .hero-headline {
   font-family: 'Google Sans', sans-serif;
-  font-size: 2.25rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #202124;
   line-height: 1.2;
@@ -117,10 +117,17 @@ body {
 }
 
 .hero-subline {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: #5f6368;
-  margin: 0 0 28px;
+  margin: 0 0 6px;
   line-height: 1.5;
+}
+
+.hero-caveat {
+  font-size: 0.75rem;
+  color: #9aa0a6;
+  margin: 0 0 28px;
+  line-height: 1.4;
 }
 
 /* ========================================
@@ -749,17 +756,6 @@ body {
   flex-wrap: wrap;
 }
 
-.arxiv-note {
-  margin-top: 14px;
-  font-size: 0.78rem;
-  color: #d93025;
-  line-height: 1.5;
-}
-
-.arxiv-note i {
-  margin-right: 4px;
-}
-
 .hero-btn {
   display: inline-flex;
   align-items: center;
@@ -1004,12 +1000,11 @@ body {
   }
 
   .hero-headline {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 
   .hero-subline {
-    font-size: 0.9rem;
-    margin-bottom: 20px;
+    font-size: 0.85rem;
   }
 
   .demo-card {
